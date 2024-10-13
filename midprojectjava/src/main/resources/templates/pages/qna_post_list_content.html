@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+
+<div th:fragment="frag_index_content" class="content-wrapper">
+  <div class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1 class="m-0">QnA 목록</h1>
+        </div>
+        <!-- /.col -->
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a href="/">Home</a></li>
+          </ol>
+        </div>
+        <!-- /.col -->
+      </div>
+      <!-- /.row -->
+    </div>
+    <!-- /.container-fluid -->
+  </div>
+
+  <section class="content">
+    <div class="container-fluid">
+      <!-- Small boxes (Stat box) -->
+      <div class="row">
+        <div class="col-lg-12 col-12">
+          <table class="table">
+            <thead class="table-warning">
+              <tr>
+                <th>No</th>
+                <th>QnA 제목</th>
+                <th>QnA 작성자</th>
+                <th>QnA 진행상태</th>
+                <th>QnA 작성시간</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:each="qPost, idx : ${qpostList}">
+                <!--  반복되는 가장 상위 요소 <= 반복문 적용 -->
+                <td>
+                  <a th:href="@{|/qpost/detail/${qPost.id}|}">
+                    <span th:text="${qPost.id}"></span>
+                  </a>
+                </td>
+                <td>
+                  <span th:text="${qPost.subject}"></span>
+                </td>
+                <td>
+                  <span th:text="${qPost.sUser.username}"></span>
+                </td>
+                <td th:switch="${qPost.qnaStatus}">
+                  <span th:case="0"> QnA 접수 </span>
+                  <span th:case="1"> QnA 진행중 </span>
+                  <span th:case="2"> QnA 완료 </span>
+                  <span th:case="10"> 보류 </span>
+                  <span th:case="*"> 상태 불명 </span>
+                </td>
+                <td>
+                  <span th:text="${qPost.createDate}"></span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="pagination">
+            <ul class="pagination">
+              <li th:if="${currentPage > 0}" class="page-item">
+                <a
+                  th:href="@{/qPost/list/{id}(id=${id}, page=${currentPage - 1}, size=${size})}"
+                  class="page-link"
+                  >Previous</a
+                >
+              </li>
+              <li
+                th:each="pageNum : ${#numbers.sequence(0, totalPages - 1)}"
+                class="page-item"
+              >
+                <a
+                  th:href="@{/qpost/list/{id}(id=${id}, page=${pageNum}, size=${size})}"
+                  class="page-link"
+                  th:text="${pageNum + 1}"
+                ></a>
+              </li>
+              <li th:if="${currentPage < totalPages - 1}" class="page-item">
+                <a
+                  th:href="@{/qpost/list/{id}(id=${id}, page=${currentPage + 1}, size=${size})}"
+                  class="page-link"
+                  >Next</a
+                >
+              </li>
+            </ul>
+          </div>
+          <a th:href="@{/qpost/create}" class="btn btn-primary">문의 등록</a>
+
+          <a th:href="@{/qpost/seller/list}" class="btn btn-danger">
+            관리자 관리
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>

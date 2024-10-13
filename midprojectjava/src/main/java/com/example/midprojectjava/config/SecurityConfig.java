@@ -28,33 +28,33 @@ public class SecurityConfig {
         @Bean
         SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
                 http
-                                .authorizeHttpRequests((a) -> a.requestMatchers(new AntPathRequestMatcher("/spmalluser/**"))
+                                .authorizeHttpRequests((a) -> a.requestMatchers(new AntPathRequestMatcher("/spmallUser/**"))
                                                 .permitAll())
                                 .authorizeHttpRequests((a) -> a
                                                 .requestMatchers(new AntPathRequestMatcher("/homepage/**")).permitAll())
                                 .authorizeHttpRequests((a) -> a
-                                                .requestMatchers(new AntPathRequestMatcher("/spmallproduct/upload/**"))
+                                                .requestMatchers(new AntPathRequestMatcher("/spmallProduct/upload/**"))
                                                 .hasAnyRole("SELLER", "ADMIN"))
 //                                .authorizeHttpRequests(
 //                                                (a) -> a.requestMatchers(new AntPathRequestMatcher("/qpost/review/**"))
 //                                                                .hasAnyRole("SELLER", "ADMIN"))
                                 .authorizeHttpRequests((a) -> a
-                                                .requestMatchers(new AntPathRequestMatcher("/spmallproduct/**")).permitAll())
+                                                .requestMatchers(new AntPathRequestMatcher("/spmallProduct/**")).permitAll())
                                 .authorizeHttpRequests(
                                                 (a) -> a.requestMatchers(
-                                                                new AntPathRequestMatcher("/spmallproduct/detail/**"))
+                                                                new AntPathRequestMatcher("/spmallProduct/detail/**"))
                                                                 .permitAll())
                                 .authorizeHttpRequests((a) -> a
-                                                .requestMatchers(new AntPathRequestMatcher("/spmallorder/**")).permitAll())
+                                                .requestMatchers(new AntPathRequestMatcher("/spmallOrder/**")).permitAll())
                                 .authorizeHttpRequests((a) -> a.requestMatchers(new AntPathRequestMatcher("/dist/**"))
                                                 .permitAll())
                                 .authorizeHttpRequests((a) -> a
                                                 .requestMatchers(new AntPathRequestMatcher("/plugins/**")).permitAll())
                                 .authorizeHttpRequests((a) -> a.requestMatchers(new AntPathRequestMatcher("/api/**"))
                                                 .permitAll())
-                                .authorizeHttpRequests((a) -> a.requestMatchers(new AntPathRequestMatcher("/spmallcart/**"))
+                                .authorizeHttpRequests((a) -> a.requestMatchers(new AntPathRequestMatcher("/spmallCart/**"))
                                                 .permitAll())
-                                .authorizeHttpRequests((a) -> a.requestMatchers(new AntPathRequestMatcher("/spmallorder/**"))
+                                .authorizeHttpRequests((a) -> a.requestMatchers(new AntPathRequestMatcher("/spmallOrder/**"))
                                                 .permitAll())
                                 .authorizeHttpRequests(
                                                 (a) -> a.requestMatchers(new AntPathRequestMatcher("/**")).permitAll())
@@ -66,12 +66,12 @@ public class SecurityConfig {
                                 .headers((c) -> c.addHeaderWriter(new XFrameOptionsHeaderWriter()))
 
                                 .formLogin((formLogin) -> formLogin
-                                                .loginPage("/spmalluser/login")
+                                                .loginPage("/spmallUser/login")
                                                 .defaultSuccessUrl("/index"))
 
                                 .logout((logout) -> logout
-                                                .logoutRequestMatcher(new AntPathRequestMatcher("/spmalluser/logout"))
-                                                .logoutSuccessUrl("/spmalluser/login")
+                                                .logoutRequestMatcher(new AntPathRequestMatcher("/spmallUser/logout"))
+                                                .logoutSuccessUrl("/spmallUser/login")
                                                 .invalidateHttpSession(true))
 
                                 .addFilterBefore(new TokenAuthenticationFilter(tokenProvider),

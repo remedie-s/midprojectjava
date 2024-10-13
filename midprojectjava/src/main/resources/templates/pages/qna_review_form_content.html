@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<div th:fragment="frag_index_content" class="content-wrapper">
+    <div class="card">
+        <p class="login-box-msg">QnA답글 입력</p>
+        <form method="post" th:object="${qReviewForm}" th:action="@{/qpost/review/create/{id}(id=${qpost.id})}">
+            <input type="hidden" id="username" th:value="${username}">
+
+            <div class="my-3">
+                <textarea name="content" id="content" class="form-control"
+                    rows="4" placeholder="답변을 작성해 주세요" required></textarea>
+            </div>
+            
+            <div class="input-group mb-3">
+                <input type="reset" value="초기화" class="btn btn-warning">
+                &nbsp;
+                <input type="submit" value="리뷰 입력" class="btn btn-warning">
+            </div>
+        </form>
+    </div>
+</div>
