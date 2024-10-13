@@ -34,8 +34,8 @@ public class SpmallUser {
     private String lastName;
     @Column(unique = true)
     private String phoneNumber;
-    @Column(unique = true)
-    private String eMail;
+    @Column(name = "email", unique = true)
+    private String email;
     private LocalDateTime createDate;
 //    유저 그레이드를 0, 1, 2, 10, 11까지 관리 0 : 브론즈, 1 : 실버, 2 : 골드, 10 : 셀러, 11 : 관리자   
     private Integer userGrade = 0;
@@ -43,14 +43,14 @@ public class SpmallUser {
     
 
     public SpmallUser(String username, String password, String firstName, String lastName, String phoneNumber,
-			String eMail, LocalDateTime createDate, Integer userGrade) {
+			String email, LocalDateTime createDate, Integer userGrade) {
 		super();
 		this.username = username;
 		this.password = password;
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.phoneNumber = phoneNumber;
-		this.eMail = eMail;
+		this.email = email;
 		this.createDate = createDate;
 		this.userGrade = userGrade;
 	}

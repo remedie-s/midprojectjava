@@ -1,18 +1,10 @@
 package com.example.midprojectjava.controller;
 
 import java.time.Duration;
-
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.ObjectError;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
-import com.example.midprojectjava.config.JwtProperties;
 import com.example.midprojectjava.dto.SpmallUserForm;
 import com.example.midprojectjava.entity.SpmallUser;
 import com.example.midprojectjava.service.SpmallUserService;
@@ -27,80 +19,71 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@Controller
+@RestController
+@CrossOrigin
 @RequiredArgsConstructor
 @RequestMapping("/spmallUser")
 public class SpmallUserController {
-	private final SpmallUserService sUserService;
+    private final SpmallUserService sUserService;
     private final TokenProvider tokenProvider;
     private final TokenService tokenService;
-    private final JwtProperties jwtProperties;
     private final UtilService utilService;
-    
 
-    @GetMapping("/{id}")
-    public String usermain(@PathVariable("id") Integer id, Model model) {
-        this.sUserService.findById(id);
-        return "user_main";
-    }
-
+    // 기존의 회원가입 화면으로 가는 메서드
     @GetMapping("/signup")
-    public String signup(Model model) {
-        model.addAttribute("spmallUserForm", new SpmallUserForm());
+    public String signupForm() {
         return "signup_form";
     }
 
+    // REST API: 회원가입
     @PostMapping("/signup")
-    public String signup(@Valid SpmallUserForm spmallUserForm, BindingResult bindingResult, HttpServletResponse response) {
-        System.out.println("가입요청");
-        if (bindingResult.hasErrors()) {
-            System.out.println("에러발생" + bindingResult.getAllErrors().size());
-            for (ObjectError err : bindingResult.getAllErrors()) {
-                log.info(err.getDefaultMessage());
-            }
-            return "signup_form";
-        }
-        System.out.println("비번체크");
+    public ResponseEntity<?> signup(@Valid @RequestBody SpmallUserForm spmallUserForm, HttpServletResponse response) {
+    	System.out.println("회원가입 시작");
+    	System.out.println(spmallUserForm.getEmail());
         if (!spmallUserForm.getPassword1().equals(spmallUserForm.getPassword2())) {
-            bindingResult.rejectValue("password", "passwordInCorrect", "비밀번호가 서로다릅니다.");
-            System.out.println("비밀번호가 다릅니다.");
-            return "signup_form";
+            return ResponseEntity.badRequest().body("비밀번호가 서로 다릅니다.");
         }
+
         SpmallUser spmallUser;
         try {
-            System.out.println("회원가입 진행");
             spmallUser = this.sUserService.create(spmallUserForm.getUsername(), spmallUserForm.getPassword1(),
-            		spmallUserForm.getFirstName(),
-            		spmallUserForm.getLastName(), spmallUserForm.getPhoneNumber(),
-            		spmallUserForm.getEMail());
-            System.out.println("회원가입 완료");
+                spmallUserForm.getFirstName(), spmallUserForm.getLastName(), 
+                spmallUserForm.getPhoneNumber(), spmallUserForm.getEmail());
         } catch (DataIntegrityViolationException e) {
-            bindingResult.reject("signupError", "이미 사용중인 회원정보입니다.");
-            return "signup_form";
+            return ResponseEntity.badRequest().body("이미 사용 중인 회원정보입니다.");
         } catch (Exception e) {
-            bindingResult.reject("signupError", "회원가입 오류입니다.");
-            return "signup_form";
+            return ResponseEntity.status(500).body("회원가입 오류입니다.");
         }
+
         String accessToken = this.tokenProvider.generateToken(spmallUser, Duration.ofDays(7));
         String refreshToken = this.tokenProvider.generateToken(spmallUser, Duration.ofDays(30));
-        System.out.println(spmallUser.getId());
         this.tokenService.saveRefreshToken(spmallUser.getId(), refreshToken);
         utilService.setCookie("access_token", accessToken, utilService.toSecondOfDay(7), response);
         utilService.setCookie("refresh_token", refreshToken, utilService.toSecondOfDay(30), response);
 
-        return "redirect:/spmallUser/login";
+        return ResponseEntity.ok("회원가입 성공");
     }
 
-    @GetMapping("/login")
-    public String login(HttpServletRequest httpServletRequest) {
-        httpServletRequest.getCookies();
-        return "login_form";
+    // REST API: 로그인
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody SpmallUserForm spmallUserForm, HttpServletResponse response) {
+        // 로그인 처리 로직 구현
+        // 성공 시 토큰 발급 및 쿠키 설정
+        return ResponseEntity.ok("로그인 성공");
     }
 
+    // 추가: 유저 정보 조회 (예시)
+    @GetMapping("/{id}")
+    public ResponseEntity<SpmallUser> getUser(@PathVariable("id") Integer id) {
+        SpmallUser user = sUserService.findById(id);
+        return ResponseEntity.ok(user);
+    }
+
+    // 추가: 리프레시 토큰 처리
     @GetMapping("/reissue/{rToken}")
-    public String reissue(@PathVariable("rToken") String rToken, HttpServletResponse httpServletResponse) {
+    public ResponseEntity<?> reissue(@PathVariable("rToken") String rToken, HttpServletResponse response) {
         String accessToken = tokenService.createNewAccessToken(rToken, 24 * 7);
-        utilService.setCookie("access_token", accessToken, utilService.toSecondOfDay(7), httpServletResponse);
-        return "redirect:/";
+        utilService.setCookie("access_token", accessToken, utilService.toSecondOfDay(7), response);
+        return ResponseEntity.ok("Access token renewed");
     }
 }

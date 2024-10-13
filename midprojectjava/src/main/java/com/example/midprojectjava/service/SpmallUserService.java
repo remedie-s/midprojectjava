@@ -40,14 +40,16 @@ public class SpmallUserService {
 	    }
 
 	    public SpmallUser create(String username, String password, String firstName, String lastName,
-	            String phoneNumber, String eMail) {
+	            String phoneNumber, String email) {
 	    	SpmallUser user = new SpmallUser();
 	        user.setUsername(username);
 	        user.setPassword(this.passwordEncoder.encode(password));
 	        user.setFirstName(firstName);
 	        user.setLastName(lastName);
 	        user.setPhoneNumber(phoneNumber);
-	        user.setEMail(eMail);
+	        System.out.println(phoneNumber);
+	        user.setEmail(email);
+	        System.out.println(email);
 	        user.setUserGrade(0);
 	        user.setCreateDate(LocalDateTime.now());
 	        try {
