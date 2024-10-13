@@ -19,7 +19,10 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter{
 
 	    private final static String ACCESS_TOKEN_PREFIX = "Bearer";
 	    private final static String HEADER_AUTH = "Authentication";
-
+	    
+	    //추가
+	    
+	    
 	    @Override
 	    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 	            throws ServletException, IOException, java.io.IOException {

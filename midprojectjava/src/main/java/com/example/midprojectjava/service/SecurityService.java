@@ -33,31 +33,34 @@ public class SecurityService implements UserDetailsService {
     @Override
     @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        log.info("사용자 인증 체크 " + username);
+        log.info("사용자 인증 체크 [" + username + "]");
 
+        // 사용자 조회
         Optional<SpmallUser> _user = this.spmallUserRepository.findByUsername(username);
-        log.info("사용자 인증 체크 " + _user.isPresent());
+        log.info("사용자 인증 체크 - 사용자 존재 여부: " + _user.isPresent());
+
         if (_user.isEmpty()) {
             throw new UsernameNotFoundException("유저를 찾을 수 없습니다.");
         }
-        log.info("사용자 인증 체크-1");
-        SpmallUser sUser = _user.get();
-        log.info("사용자 인증 체크 " + sUser);
-        log.info("사용자 인증 체크0");
+
+        SpmallUser spmallUser = _user.get();
+        log.info("사용자 인증 체크 - 사용자 정보: " + spmallUser);
+        log.info("사용자 인증 체크 - 비밀번호: " + spmallUser.getPassword()); // 비밀번호 출력 (보안상 주의)
+        
         List<GrantedAuthority> authorities = new ArrayList<>();
-        log.info("사용자 인증 체크1");
-        if ("admin".equals(username)) {// TODO 유저그레이드 바꿔야함
-            log.info("사용자 인증 체크2");
+        
+        // 권한 설정
+        if ("admin".equals(username)) {
             authorities.add(new SimpleGrantedAuthority(SpmallUserGrade.ADMIN.getValue()));
         } else if ("seller".equals(username)) {
             authorities.add(new SimpleGrantedAuthority(SpmallUserGrade.SELLER.getValue()));
-            log.info("사용자 인증 체크3");
         } else {
             authorities.add(new SimpleGrantedAuthority(SpmallUserGrade.BRONZE.getValue()));
-            log.info("사용자 인증 체크4");
         }
+        log.info("권한 부여 완료");
 
-        return new User(sUser.getUsername(), sUser.getPassword(), authorities);
+        return new User(spmallUser.getUsername(), spmallUser.getPassword(), authorities);
     }
+
 
 }

@@ -29,7 +29,8 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
-
+import lombok.extern.slf4j.Slf4j;
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class TokenProvider {
@@ -112,4 +113,21 @@ public class TokenProvider {
         }
         return false;
     }
+
+    public String createToken(Authentication authentication) {
+        Object principal = authentication.getPrincipal();
+        log.info("Authentication principal class: " + principal.getClass().getName());
+
+        if (principal instanceof SpmallUser) {
+            SpmallUser user = (SpmallUser) principal;
+            
+            // Set expiration time (e.g., 1 hour)
+            Duration expirationTime = Duration.ofHours(1);
+            
+            return generateToken(user, expirationTime);
+        } else {
+            throw new ClassCastException("Authentication principal is not an instance of SpmallUser");
+        }
+    }
+
 }

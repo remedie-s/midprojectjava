@@ -8,6 +8,6 @@ import com.example.midprojectjava.entity.SpmallUser;
 
 public interface SpmallUserRepository extends JpaRepository<SpmallUser, Integer> {
 
-	Optional<SpmallUser> findByUsername(String name);
+	Optional<SpmallUser> findByUsername(String username);
 
 }

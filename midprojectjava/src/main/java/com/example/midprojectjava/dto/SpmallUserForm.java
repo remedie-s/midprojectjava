@@ -19,8 +19,9 @@ public class SpmallUserForm {
     @NotEmpty(message = "성을 입력하세요")
     private String lastName;
     private String phoneNumber;
-//    @Email
-//    @NotEmpty(message = "이메일을 입력하세요")
+    @Email
+    @NotEmpty(message = "이메일을 입력하세요")
     private String email;
+
 
 }

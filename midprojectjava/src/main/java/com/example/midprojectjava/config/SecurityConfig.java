@@ -26,11 +26,10 @@ import com.example.midprojectjava.service.TokenProvider;
 
 import lombok.RequiredArgsConstructor;
 
-
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
-public class SecurityConfig {
+public class SecurityConfig   {
     private final TokenProvider tokenProvider;
 
     @Bean
@@ -40,10 +39,9 @@ public class SecurityConfig {
             .and()
             .authorizeHttpRequests((a) -> a
                 .requestMatchers(new AntPathRequestMatcher("/spmallUser/**")).permitAll()
+                .requestMatchers(new AntPathRequestMatcher("/spmallUser/login")).permitAll()
                 .requestMatchers(new AntPathRequestMatcher("/spmallUser/signup")).permitAll() 
-                // Signup URL을 허용
                 .requestMatchers(new AntPathRequestMatcher("/homepage/**")).permitAll()
-                .requestMatchers(new AntPathRequestMatcher("/spmallProduct/upload/**")).hasAnyRole("SELLER", "ADMIN")
                 .requestMatchers(new AntPathRequestMatcher("/spmallProduct/**")).permitAll()
                 .requestMatchers(new AntPathRequestMatcher("/spmallOrder/**")).permitAll()
                 .requestMatchers(new AntPathRequestMatcher("/dist/**")).permitAll()
@@ -51,14 +49,9 @@ public class SecurityConfig {
                 .requestMatchers(new AntPathRequestMatcher("/api/**")).permitAll()
                 .requestMatchers(new AntPathRequestMatcher("/spmallCart/**")).permitAll()
                 .requestMatchers(new AntPathRequestMatcher("/**")).permitAll())
-            .csrf((b) -> b.ignoringRequestMatchers(new AntPathRequestMatcher("/api/**"))
-            		.ignoringRequestMatchers(new AntPathRequestMatcher("/spmallUser/signup"))
-                          .ignoringRequestMatchers(new AntPathRequestMatcher("/dist/**"))
-                          .ignoringRequestMatchers(new AntPathRequestMatcher("/plugins/**")))
+            .csrf().disable() // CSRF 비활성화
             .headers((c) -> c.addHeaderWriter(new XFrameOptionsHeaderWriter()))
-            .formLogin((formLogin) -> formLogin
-                .loginPage("/spmallUser/login")
-                .defaultSuccessUrl("/index"))
+            // .formLogin().disable() // 폼 로그인을 비활성화하고 JSON으로 로그인 처리
             .logout((logout) -> logout
                 .logoutRequestMatcher(new AntPathRequestMatcher("/spmallUser/logout"))
                 .logoutSuccessUrl("/spmallUser/login")
@@ -91,3 +84,4 @@ public class SecurityConfig {
         return authenticationConfiguration.getAuthenticationManager();
     }
 }
+

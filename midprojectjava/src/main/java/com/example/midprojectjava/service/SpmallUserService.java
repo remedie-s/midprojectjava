@@ -18,11 +18,11 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class SpmallUserService {
-	  private final SpmallUserRepository sUserRepository;
+	  private final SpmallUserRepository spmallUserRepository;
 	    private final PasswordEncoder passwordEncoder;
 
 	    public SpmallUser findById(Integer id) {
-	        Optional<SpmallUser> byId = this.sUserRepository.findById(id);
+	        Optional<SpmallUser> byId = this.spmallUserRepository.findById(id);
 	        if (byId.isPresent()) {
 	            return byId.get();
 	        } else {
@@ -32,7 +32,7 @@ public class SpmallUserService {
 	    }
 
 	    public SpmallUser findByUsername(String name) {
-	        Optional<SpmallUser> user = this.sUserRepository.findByUsername(name);
+	        Optional<SpmallUser> user = this.spmallUserRepository.findByUsername(name);
 	        if (user.isPresent()) {
 	            return user.get();
 	        }
@@ -53,7 +53,7 @@ public class SpmallUserService {
 	        user.setUserGrade(0);
 	        user.setCreateDate(LocalDateTime.now());
 	        try {
-	            this.sUserRepository.save(user);
+	            this.spmallUserRepository.save(user);
 	        } catch (Exception e) {
 	            System.out.println(e.getMessage());
 	            e.printStackTrace();
