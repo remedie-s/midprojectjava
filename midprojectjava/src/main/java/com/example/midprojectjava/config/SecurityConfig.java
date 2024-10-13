@@ -1,6 +1,6 @@
 package com.example.midprojectjava.config;
 
-// TODO 고쳐야함
+// TODO 쇼핑몰 http 보안설정 바꿔야함
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,35 +28,33 @@ public class SecurityConfig {
         @Bean
         SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
                 http
-                                .authorizeHttpRequests((a) -> a.requestMatchers(new AntPathRequestMatcher("/suser/**"))
+                                .authorizeHttpRequests((a) -> a.requestMatchers(new AntPathRequestMatcher("/spmalluser/**"))
                                                 .permitAll())
                                 .authorizeHttpRequests((a) -> a
                                                 .requestMatchers(new AntPathRequestMatcher("/homepage/**")).permitAll())
                                 .authorizeHttpRequests((a) -> a
-                                                .requestMatchers(new AntPathRequestMatcher("/product/upload/**"))
+                                                .requestMatchers(new AntPathRequestMatcher("/spmallproduct/upload/**"))
                                                 .hasAnyRole("SELLER", "ADMIN"))
+//                                .authorizeHttpRequests(
+//                                                (a) -> a.requestMatchers(new AntPathRequestMatcher("/qpost/review/**"))
+//                                                                .hasAnyRole("SELLER", "ADMIN"))
                                 .authorizeHttpRequests((a) -> a
-                                                .requestMatchers(new AntPathRequestMatcher("/qpost/**")).permitAll())
-                                .authorizeHttpRequests(
-                                                (a) -> a.requestMatchers(new AntPathRequestMatcher("/qpost/review/**"))
-                                                                .hasAnyRole("SELLER", "ADMIN"))
-                                .authorizeHttpRequests((a) -> a
-                                                .requestMatchers(new AntPathRequestMatcher("/product/**")).permitAll())
+                                                .requestMatchers(new AntPathRequestMatcher("/spmallproduct/**")).permitAll())
                                 .authorizeHttpRequests(
                                                 (a) -> a.requestMatchers(
-                                                                new AntPathRequestMatcher("/product/detail/**"))
+                                                                new AntPathRequestMatcher("/spmallproduct/detail/**"))
                                                                 .permitAll())
                                 .authorizeHttpRequests((a) -> a
-                                                .requestMatchers(new AntPathRequestMatcher("/sorder/**")).permitAll())
+                                                .requestMatchers(new AntPathRequestMatcher("/spmallorder/**")).permitAll())
                                 .authorizeHttpRequests((a) -> a.requestMatchers(new AntPathRequestMatcher("/dist/**"))
                                                 .permitAll())
                                 .authorizeHttpRequests((a) -> a
                                                 .requestMatchers(new AntPathRequestMatcher("/plugins/**")).permitAll())
                                 .authorizeHttpRequests((a) -> a.requestMatchers(new AntPathRequestMatcher("/api/**"))
                                                 .permitAll())
-                                .authorizeHttpRequests((a) -> a.requestMatchers(new AntPathRequestMatcher("/cart/**"))
+                                .authorizeHttpRequests((a) -> a.requestMatchers(new AntPathRequestMatcher("/spmallcart/**"))
                                                 .permitAll())
-                                .authorizeHttpRequests((a) -> a.requestMatchers(new AntPathRequestMatcher("/order/**"))
+                                .authorizeHttpRequests((a) -> a.requestMatchers(new AntPathRequestMatcher("/spmallorder/**"))
                                                 .permitAll())
                                 .authorizeHttpRequests(
                                                 (a) -> a.requestMatchers(new AntPathRequestMatcher("/**")).permitAll())
@@ -68,12 +66,12 @@ public class SecurityConfig {
                                 .headers((c) -> c.addHeaderWriter(new XFrameOptionsHeaderWriter()))
 
                                 .formLogin((formLogin) -> formLogin
-                                                .loginPage("/suser/login")
+                                                .loginPage("/spmalluser/login")
                                                 .defaultSuccessUrl("/index"))
 
                                 .logout((logout) -> logout
-                                                .logoutRequestMatcher(new AntPathRequestMatcher("/suser/logout"))
-                                                .logoutSuccessUrl("/suser/login")
+                                                .logoutRequestMatcher(new AntPathRequestMatcher("/spmalluser/logout"))
+                                                .logoutSuccessUrl("/spmalluser/login")
                                                 .invalidateHttpSession(true))
 
                                 .addFilterBefore(new TokenAuthenticationFilter(tokenProvider),

@@ -14,7 +14,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class TokenAuthenticationFilter {
+public class TokenAuthenticationFilter extends OncePerRequestFilter{
 	 private final TokenProvider tokenProvider;
 
 	    private final static String ACCESS_TOKEN_PREFIX = "Bearer";
@@ -43,18 +43,18 @@ public class TokenAuthenticationFilter {
 	            }
 	        }
 
-	        if (tokenProvider.isVaildToken(accessToken)) {
+	        if (tokenProvider.isValidToken (accessToken)) {
 	            System.out.println("유효한 토큰");
 	            filterChain.doFilter(request, response);
 	        } else {
 	            System.out.println("유효하지 않은 토큰");
-	            if (!tokenProvider.isVaildToken(refreshToken)) {
+	            if (!tokenProvider.isValidToken (refreshToken)) {
 	                System.out.println("리프레시토큰 문제 발생");
 	                response.sendRedirect("/suser/signup");
 	                return;
 	            }
 
-	            if (!tokenProvider.isVaildToken(refreshToken)) {
+	            if (!tokenProvider.isValidToken (refreshToken)) {
 	                System.out.println("리프레시 토큰이 디비에 등록 X");
 	                response.sendRedirect("/suser/signup");
 	                return;

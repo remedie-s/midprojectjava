@@ -1,3 +1,6 @@
+/**
+ * 쇼핑몰 리프레시 토큰 엔티티 입니다
+ */
 package com.example.midprojectjava.entity;
 import java.time.LocalDateTime;
 
@@ -16,17 +19,17 @@ import lombok.NoArgsConstructor;
 public class RefreshToken {
 	 @Id
 	    @GeneratedValue(strategy = GenerationType.IDENTITY)
-	    @Column(name = "suserid", updatable = false)
-	    private Integer suserid;
+	    @Column(name = "spmallUserId", updatable = false)
+	    private Integer spmallUserId;
 
 	    @Column(nullable = false)
 	    private String refreshToken;
 
 	    private LocalDateTime createDate;
 
-	    public RefreshToken(Integer suserid, String refreshToken) {
+	    public RefreshToken(Integer spmallUserId, String refreshToken) {
 	        super();
-	        this.suserid = suserid;
+	        this.spmallUserId = spmallUserId;
 	        this.refreshToken = refreshToken;
 	        this.createDate = LocalDateTime.now();
 	    }

@@ -1,3 +1,6 @@
+/**
+ * 쇼핑몰 이용자 토큰공급자 서비스입니다
+ */
 package com.example.midprojectjava.service;
 
 import java.time.Duration;
@@ -54,7 +57,7 @@ public class TokenProvider {
 
     }
 
-    public boolean isVaildToken(String token) {
+    public boolean isValidToken(String token) {
         try {
             Jwts.parser()
                     .setSigningKey(jwtProperties.getSecretKey())

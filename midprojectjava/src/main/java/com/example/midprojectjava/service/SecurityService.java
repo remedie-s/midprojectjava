@@ -1,3 +1,6 @@
+/**
+ * 쇼핑몰 보안 서비스입니다 로그인 관리를 합니다.
+ */
 package com.example.midprojectjava.service;
 
 import java.util.ArrayList;
@@ -22,7 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
-public class SecurityService {
+public class SecurityService implements UserDetailsService {
 
     @Autowired
     private SpmallUserRepository spmallUserRepository;

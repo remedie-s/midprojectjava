@@ -1,3 +1,6 @@
+/**
+ * 쇼핑몰 주소 엔티티입니다
+ */
 package com.example.midprojectjava.entity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

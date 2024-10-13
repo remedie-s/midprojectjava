@@ -1,3 +1,6 @@
+/**
+ * 쇼핑몰 물품의 구매 유저 관리 엔티티입니다
+ */
 package com.example.midprojectjava.entity;
 import java.time.LocalDateTime;
 
@@ -24,7 +27,7 @@ public class SpmallProUser {
     private SpmallUser spmallUser;
 
     @ManyToOne
-    private SpmallProduct spmallproduct;
+    private SpmallProduct spmallProduct;
 
     private LocalDateTime createDate;
 }

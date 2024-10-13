@@ -1,3 +1,6 @@
+/**
+ * 쇼핑몰 물품 엔티티입니다
+ */
 package com.example.midprojectjava.entity;
 
 import java.time.LocalDateTime;
@@ -47,12 +50,12 @@ public class SpmallProduct {
 			this.sellCount = sellCount=0;
 		}
 		@JsonIgnore
-	    @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE)
+	    @OneToMany(mappedBy = "spmallProduct", cascade = CascadeType.REMOVE)
 	    private List<SpmallProReview> reviewList;
 	    @JsonIgnore
-	    @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE)
+	    @OneToMany(mappedBy = "spmallProduct", cascade = CascadeType.REMOVE)
 	    private List<SpmallProUser> userList;
 	    @JsonIgnore
-	    @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE)
+	    @OneToMany(mappedBy = "spmallProduct", cascade = CascadeType.REMOVE)
 	    private List<SpmallOrder> orderList;
 }

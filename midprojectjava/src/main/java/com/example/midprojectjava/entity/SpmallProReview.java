@@ -1,3 +1,6 @@
+/**
+ * 쇼핑몰 물품의 리뷰 엔티티입니다
+ */
 package com.example.midprojectjava.entity;
 
 
@@ -16,17 +19,17 @@ import lombok.Setter;
 @Entity
 @NoArgsConstructor
 public class SpmallProReview {
-	 @Id
+		@Id
 	    @GeneratedValue(strategy = GenerationType.IDENTITY)
 	    private Integer id;
-
+		
 	    private String content;
 
 	    private LocalDateTime createDate;
 
 	    @ManyToOne
-	    private SpmallProduct product;
+	    private SpmallProduct spmallProduct;
 
 	    @ManyToOne
-	    private SpmallUser sUser;
+	    private SpmallUser spmallUser;
 }

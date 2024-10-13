@@ -1,3 +1,6 @@
+/**
+ * 쇼핑몰 토큰 서비스입니다
+ */
 package com.example.midprojectjava.service;
 import java.time.Duration;
 import java.util.Optional;
@@ -21,16 +24,16 @@ public class TokenService {
     private final RefreshTokenRepository refreshTokenRepository;
 
     public String createNewAccessToken(String refreshToken, int hour) {
-        if (!tokenProvider.isVaildToken(refreshToken)) {
+        if (!tokenProvider.isValidToken(refreshToken)) {
             throw new IllegalArgumentException("Unexpected token");
         }
         if (!tokenProvider.isValidRefreshToken(refreshToken)) {
             throw new IllegalArgumentException("Unexpected token");
         }
         //TODO 바꿔야함
-        Integer suserId = findByRefreshToken(refreshToken).getSuserid();
+        Integer suserId = findByRefreshToken(refreshToken).getSpmallUserId();
         SpmallUser spmallUser = spmallUserService.findById(suserId);
-        return tokenProvider.generateToken(suser, Duration.ofHours(hour));
+        return tokenProvider.generateToken(spmallUser, Duration.ofHours(hour));
     }
 
     public RefreshToken findByRefreshToken(String refreshToken) {
@@ -50,7 +53,7 @@ public class TokenService {
     }
 
     public void saveRefreshToken(Integer id, String token) {
-        System.out.println("Saving refresh token: sUserId=" + id + ", token=" + token);
+        System.out.println("Saving refresh token: spmallUserId=" + id + ", token=" + token);
         RefreshToken refreshToken = new RefreshToken(id, token);
         this.refreshTokenRepository.save(refreshToken);
     }

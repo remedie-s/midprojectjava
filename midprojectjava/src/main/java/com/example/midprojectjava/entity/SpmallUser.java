@@ -1,3 +1,6 @@
+/**
+ * 쇼핑몰 유저관리 엔티티입니다
+ */
 package com.example.midprojectjava.entity;
 
 import java.time.LocalDateTime;
@@ -34,6 +37,7 @@ public class SpmallUser {
     @Column(unique = true)
     private String eMail;
     private LocalDateTime createDate;
+//    유저 그레이드를 0, 1, 2, 10, 11까지 관리 0 : 브론즈, 1 : 실버, 2 : 골드, 10 : 셀러, 11 : 관리자   
     private Integer userGrade = 0;
 
     

@@ -1,3 +1,6 @@
+/**
+ * 쇼핑몰 카트 엔티티입니다
+ */
 package com.example.midprojectjava.entity;
 import java.time.LocalDateTime;
 
