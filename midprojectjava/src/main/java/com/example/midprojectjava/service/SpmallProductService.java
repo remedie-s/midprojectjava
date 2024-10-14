@@ -31,7 +31,7 @@ public class SpmallProductService {
 	        return productRepository.findAll(pageable);
 	    }
 
-	    public SpmallProduct create(String productName, String description, Long price, Integer quantity, Integer category,
+	    public SpmallProduct create(String productName, String description, Long price, Integer quantity, String category,
 	            String imageUrl) {
 	    	SpmallProduct p = new SpmallProduct();
 	        p.setProductName(productName);
@@ -57,6 +57,11 @@ public class SpmallProductService {
 	    public void save(SpmallProduct product) {
 	        this.productRepository.save(product);
 	    }
+	    
+	    public List<SpmallProduct> getProductListByCategory(String category){
+	    	return this.productRepository.findAllByCategory(category);
+	    }
+	    
 
 	    public SpmallProduct findById(Integer id) {
 	        Optional<SpmallProduct> product = this.productRepository.findById(id);

@@ -33,12 +33,12 @@ public class SpmallProduct {
 	    private Integer quantity;
 	    private String imageUrl;
 	    private LocalDateTime createDate;
-	    private Integer category;
+	    private String category;
 	    private Integer sellCount=0;
 	    
 	    
 	    public SpmallProduct(String productName, String description, Long price, Integer quantity, String imageUrl,
-				LocalDateTime createDate, Integer category, Integer sellCount) {
+				LocalDateTime createDate, String category, Integer sellCount) {
 			super();
 			this.productName = productName;
 			this.description = description;

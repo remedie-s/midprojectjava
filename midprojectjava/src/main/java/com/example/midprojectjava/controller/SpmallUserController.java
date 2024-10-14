@@ -51,7 +51,7 @@ public class SpmallUserController {
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@Valid @RequestBody SpmallUserForm spmallUserForm, HttpServletResponse response) {
     	System.out.println("회원가입 시작");
-    	System.out.println(spmallUserForm.getEmail());
+//    	System.out.println(spmallUserForm.getEmail());
         if (!spmallUserForm.getPassword1().equals(spmallUserForm.getPassword2())) {
             return ResponseEntity.badRequest().body("비밀번호가 서로 다릅니다.");
         }
