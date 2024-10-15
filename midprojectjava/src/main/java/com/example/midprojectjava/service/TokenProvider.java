@@ -129,5 +129,18 @@ public class TokenProvider {
             throw new ClassCastException("Authentication principal is not an instance of SpmallUser");
         }
     }
+    public String createRefreshToken(SpmallUser user) {
+        String refreshToken = Jwts.builder()
+                .setSubject(user.getUsername())
+                .setExpiration(new Date(System.currentTimeMillis() + Duration.ofDays(30).toMillis())) // 예: 30일
+                .signWith(SignatureAlgorithm.HS256, jwtProperties.getSecretKey())
+                .compact();
+
+        // 리프레시 토큰을 DB에 저장하는 로직 추가
+        refreshTokenRepository.save(new RefreshToken(user.getId(), refreshToken)); // 필요시
+
+        return refreshToken;
+    }
+
 
 }

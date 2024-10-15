@@ -13,10 +13,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.midprojectjava.dto.SpmallProductCartForm;
 import com.example.midprojectjava.dto.SpmallProductForm;
-import com.example.midprojectjava.dto.SpmallProductReivewForm;
+import com.example.midprojectjava.dto.SpmallProductReviewForm;
 import com.example.midprojectjava.entity.SpmallProReview;
 import com.example.midprojectjava.entity.SpmallProduct;
+import com.example.midprojectjava.service.SpmallCartService;
 import com.example.midprojectjava.service.SpmallProReviewService;
 import com.example.midprojectjava.service.SpmallProductService;
 import com.example.midprojectjava.service.SpmallUserService;
@@ -36,31 +38,48 @@ public class SpmallProductController {
 	private SpmallProReviewService spmallProReviewService;
 	@Autowired
 	private SpmallUserService spmallUserService;
+	@Autowired
+	private SpmallCartService spmallCartService;
 	
-	
-	@GetMapping("/list")
-	public List<SpmallProduct> getProductList(){
-		return this.productService.getAllProduct();
-	}
-	@GetMapping("/list/category")
-	public List<SpmallProduct> getProductListByCategory(String category){
-		return this.productService.getProductListByCategory(category);
+
+	@GetMapping("/list/{category}")
+	public List<SpmallProduct> getProductListByCategory(@PathVariable String category){
+		if(category.equals("all")) {
+			return this.productService.getAllProduct(); //모든 자료 요청
+		}		
+		return this.productService.getProductListByCategory(category); // 자료 하나만 요청
 	}
 	@GetMapping("/{productId}")
 	public SpmallProduct getProduct(@PathVariable Integer productId) {
 		return this.productService.findById(productId);
 	}
 	
-	@PostMapping
+	@PostMapping("/create")
 	public ResponseEntity<?> createProduct(@Valid @RequestBody SpmallProductForm spmallProductForm, HttpServletResponse response) {
 		Map<String, String> responseBody = new HashMap<>();
-		try {this.productService.create(spmallProductForm.getProductName(),
-				spmallProductForm.getDescription(), spmallProductForm.getPrice(),
-				spmallProductForm.getQuantity(), spmallProductForm.getCategory(), spmallProductForm.getImageUrl());
-		 
-		
- 	    responseBody.put("id", spmallProductForm.getId().toString());
- 	    responseBody.put("productName", spmallProductForm.getProductName());
+		try {
+			this.productService.create(spmallProductForm.getProductName(),
+			spmallProductForm.getDescription(), spmallProductForm.getPrice(),
+			spmallProductForm.getQuantity(), spmallProductForm.getCategory(), spmallProductForm.getImageUrl());
+	
+			responseBody.put("id", this.productService.findByProductName(spmallProductForm.getProductName()).getId().toString());
+			responseBody.put("productName", spmallProductForm.getProductName());
+		}
+		catch(Exception e) {
+            return ResponseEntity.status(500).body("회원가입 오류입니다.");
+        }
+		return ResponseEntity.ok(responseBody);
+	}
+	
+	@PostMapping("/cart")
+	public ResponseEntity<?> productToCart(@Valid @RequestBody SpmallProductCartForm spmallProductCartForm, HttpServletResponse response) {
+		Map<String, Object> responseBody = new HashMap<>();
+		try {
+			this.spmallCartService.create(spmallProductCartForm.getQuantity(),
+			this.productService.findById(spmallProductCartForm.getProductId()), this.spmallUserService.findById(spmallProductCartForm.getUserId()) );
+	
+			responseBody.put("userId", spmallProductCartForm.getUserId());
+			responseBody.put("productId", spmallProductCartForm.getProductId());
 		}
 		catch(Exception e) {
             return ResponseEntity.status(500).body("회원가입 오류입니다.");
@@ -69,7 +88,7 @@ public class SpmallProductController {
 	}
 	
 	@PostMapping("/review")
-	public ResponseEntity<?> createProductReview(@Valid @RequestBody SpmallProductReivewForm spmallProductReivewForm, HttpServletResponse response) {
+	public ResponseEntity<?> createProductReview(@Valid @RequestBody SpmallProductReviewForm spmallProductReivewForm, HttpServletResponse response) {
 		Map<String, String> responseBody = new HashMap<>();
 		try {
 			this.spmallProReviewService.create(spmallProductReivewForm.getContent(),this.spmallUserService.findById(spmallProductReivewForm.getUserId()) 

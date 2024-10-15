@@ -72,35 +72,48 @@ public class SpmallUserController {
         this.tokenService.saveRefreshToken(spmallUser.getId(), refreshToken);
         utilService.setCookie("access_token", accessToken, utilService.toSecondOfDay(7), response);
         utilService.setCookie("refresh_token", refreshToken, utilService.toSecondOfDay(30), response);
+        // 응답 객체 생성
+        Map<String, Object> responseBody = new HashMap<>();
+        responseBody.put("id", spmallUser.getId());
+        responseBody.put("username", spmallUser.getUsername());
+        responseBody.put("accessToken", accessToken);
+        responseBody.put("refreshToken", refreshToken);
 
-        return ResponseEntity.ok("회원가입 성공");
+        // 회원가입 성공 및 토큰 반환
+        return ResponseEntity.ok(responseBody);
     }
     
     // REST API: 로그인
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody SpmallUserLoginForm spmallUserLoginForm, HttpServletResponse response) {
-    	 String username = spmallUserLoginForm.getUsername();
-    	    String password = spmallUserLoginForm.getPassword();
-    	    log.info(username+password);
-    	    // 인증 처리 (Spring Security의 AuthenticationManager를 사용)
-    	    Authentication authentication = authenticationManager.authenticate(
-    	        new UsernamePasswordAuthenticationToken(username, password)
-    	    );
+        String username = spmallUserLoginForm.getUsername();
+        String password = spmallUserLoginForm.getPassword();
+        log.info("로그인 요청: " + username);
 
-    	    // 사용자 정보를 담은 응답 객체
-    	    Map<String, String> responseBody = new HashMap<>();
-    	    log.info(this.sUserService.findByUsername(username).getId().toString());
-    	    responseBody.put("id", this.sUserService.findByUsername(username).getId().toString());
-    	    responseBody.put("username", username);
+        // 인증 처리 (Spring Security의 AuthenticationManager 사용)
+        Authentication authentication = authenticationManager.authenticate(
+            new UsernamePasswordAuthenticationToken(username, password)
+        );
 
-    	    // 토큰 발급
-//    	    log.info("토큰 발급");
-//    	    String token = tokenProvider.createToken(authentication); // 토큰 발급 에러뜸
-//    	    log.info("토큰 발급완료");
-    	    // 토큰을 클라이언트에게 반환
-    	    return ResponseEntity.ok(responseBody);
-//    	    return ResponseEntity.ok(new LoginResponse(token)); 
+        // 사용자 정보를 가져옴
+        SpmallUser user = sUserService.findByUsername(username);
+        log.info("사용자 ID: " + user.getId());
+
+        // 토큰 발급
+//        String accessToken = tokenProvider.createToken(authentication); // 액세스 토큰
+//        String refreshToken = tokenProvider.createRefreshToken(user); // 리프레시 토큰
+
+        // 응답 객체 생성
+        Map<String, Object> responseBody = new HashMap<>();
+        responseBody.put("id", user.getId());
+        responseBody.put("username", username);
+//        responseBody.put("accessToken", accessToken);
+//        responseBody.put("refreshToken", refreshToken);
+
+        // 토큰을 클라이언트에게 반환
+        return ResponseEntity.ok(responseBody);
     }
+
 
     // 추가: 유저 정보 조회 (예시)
     @GetMapping("/{id}")

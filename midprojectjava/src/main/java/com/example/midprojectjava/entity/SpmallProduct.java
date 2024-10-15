@@ -6,9 +6,12 @@ package com.example.midprojectjava.entity;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.hibernate.validator.constraints.UniqueElements;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -27,6 +30,7 @@ public class SpmallProduct {
 		@Id
 	    @GeneratedValue(strategy = GenerationType.IDENTITY)
 	    private Integer id;
+		@Column(unique = true)
 	    private String productName;
 	    private String description;
 	    private Long price;

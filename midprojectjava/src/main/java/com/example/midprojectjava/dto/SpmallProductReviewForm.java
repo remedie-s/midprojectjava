@@ -8,7 +8,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class SpmallProductReivewForm {
+public class SpmallProductReviewForm {
 	
 	
 	private String content;

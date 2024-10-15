@@ -70,4 +70,18 @@ public class SpmallProductService {
 	        }
 	        throw new DataNotFoundException("product not found");
 	    }
+	    
+	    public SpmallProduct findByProductName(String productName) {
+	    	Optional<SpmallProduct> product = this.productRepository.findByProductName(productName);
+	        if (product.isPresent()) {
+	            return product.get();
+	        }
+	        throw new DataNotFoundException("product not found");
+	    }
 }
+
+
+
+
+
+

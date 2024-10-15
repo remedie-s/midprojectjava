@@ -2,6 +2,7 @@
  * 쇼핑몰 카트 서비스입니다
  */
 package com.example.midprojectjava.service;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -10,6 +11,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.example.midprojectjava.entity.SpmallCart;
+import com.example.midprojectjava.entity.SpmallProduct;
+import com.example.midprojectjava.entity.SpmallUser;
 import com.example.midprojectjava.exception.DataNotFoundException;
 import com.example.midprojectjava.repository.SpmallCartRepository;
 
@@ -33,10 +36,14 @@ public class SpmallCartService {
 	        this.sCartRepository.delete(cart);
 	    }
 
-	    public void save(SpmallCart sCart) {
-	        System.out.println("11111" + sCart);
-
-	        this.sCartRepository.save(sCart);
+	    
+	    public void create(Integer quantity, SpmallProduct spmallProduct, SpmallUser spmallUser) {
+	    	SpmallCart spmallCart = new SpmallCart();
+	    	spmallCart.setQuantity(quantity);
+	    	spmallCart.setSpmallProduct(spmallProduct);
+	    	spmallCart.setSpmallUser(spmallUser);
+	    	spmallCart.setCreateDate(LocalDateTime.now());
+	    	this.sCartRepository.save(spmallCart);
 	    }
 
 	    
