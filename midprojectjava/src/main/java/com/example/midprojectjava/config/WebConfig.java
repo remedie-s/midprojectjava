@@ -11,7 +11,7 @@ public class WebConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/api/**") // API 경로
                 .allowedOrigins("http://localhost:3000") // Next.js URL
-                .allowedMethods("GET", "POST", "PUT", "DELETE") // 허용할 HTTP 메소드
+                .allowedMethods("GET", "POST", "PUT", "DELETE" , "OPTIONS") // 허용할 HTTP 메소드
                 .allowedHeaders("*")
         		.allowCredentials(true); // 쿠키, 인증 정보 허용
     }

@@ -43,7 +43,7 @@ public class SpmallProductController {
 	
 
 	@GetMapping("/list/{category}")
-	public List<SpmallProduct> getProductListByCategory(@PathVariable String category){
+	public List<SpmallProduct> getProductListByCategory(@PathVariable("category") String category){
 		if(category.equals("all")) {
 			return this.productService.getAllProduct(); //모든 자료 요청
 		}		
