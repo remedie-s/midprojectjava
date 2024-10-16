@@ -108,7 +108,7 @@ public class SpmallUserController {
         responseBody.put("id", user.getId());
         responseBody.put("username", username);
         responseBody.put("accessToken", accessToken);
-       responseBody.put("refreshToken", refreshToken);
+        responseBody.put("refreshToken", refreshToken);
 
         // 토큰을 클라이언트에게 반환
         return ResponseEntity.ok(responseBody);

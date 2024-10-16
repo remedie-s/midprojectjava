@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.midprojectjava.dto.SpmallProductCartForm;
 import com.example.midprojectjava.dto.SpmallProductForm;
 import com.example.midprojectjava.dto.SpmallProductReviewForm;
+import com.example.midprojectjava.entity.SpmallCart;
 import com.example.midprojectjava.entity.SpmallProReview;
 import com.example.midprojectjava.entity.SpmallProduct;
 import com.example.midprojectjava.service.SpmallCartService;
@@ -78,11 +79,20 @@ public class SpmallProductController {
 	public ResponseEntity<?> productToCart(@Valid @RequestBody SpmallProductCartForm spmallProductCartForm, HttpServletResponse response) {
 		Map<String, Object> responseBody = new HashMap<>();
 		try {
-			this.spmallCartService.create(spmallProductCartForm.getQuantity(),
-			this.productService.findById(spmallProductCartForm.getProductId()), this.spmallUserService.findById(spmallProductCartForm.getUserId()) );
-	
-			responseBody.put("userId", spmallProductCartForm.getUserId());
-			responseBody.put("productId", spmallProductCartForm.getProductId());
+			// 유저 아이디로 카트리스트를 찾은 다음 물품 존재 여부 확인
+			List<SpmallCart>cartlist=this.spmallCartService.findBySpmallUserId(spmallProductCartForm.getUserId());
+			for (SpmallCart spmallCart : cartlist) {
+				if(spmallCart.getSpmallProduct().getId()==spmallProductCartForm.getProductId()) {
+					spmallCart.setQuantity(spmallCart.getQuantity()+spmallProductCartForm.getQuantity());
+					log.info("장바구니에 이미 존재하여 갯수를 추가하였습니다");
+				}
+			}//TODO 고쳐야함
+			 this.spmallCartService.create(spmallProductCartForm.getQuantity(),
+			 this.productService.findById(spmallProductCartForm.getProductId()), this.spmallUserService.findById(spmallProductCartForm.getUserId()) );
+			 
+			 log.info("카트 등록에 성공했습니다.");
+			 responseBody.put("userId", spmallProductCartForm.getUserId());
+			 responseBody.put("productId", spmallProductCartForm.getProductId());	
 		}
 		catch(Exception e) {
             return ResponseEntity.status(500).body("카트 등록 오류입니다.");
