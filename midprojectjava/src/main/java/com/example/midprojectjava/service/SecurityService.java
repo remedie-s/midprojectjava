@@ -21,14 +21,16 @@ import com.example.midprojectjava.config.SpmallUserGrade;
 import com.example.midprojectjava.entity.SpmallUser;
 import com.example.midprojectjava.repository.SpmallUserRepository;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class SecurityService implements UserDetailsService {
 
-    @Autowired
-    private SpmallUserRepository spmallUserRepository;
+    
+    private final SpmallUserRepository spmallUserRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -46,20 +48,13 @@ public class SecurityService implements UserDetailsService {
         SpmallUser spmallUser = _user.get();
         log.info("사용자 인증 체크 - 사용자 정보: " + spmallUser);
         log.info("사용자 인증 체크 - 비밀번호: " + spmallUser.getPassword()); // 비밀번호 출력 (보안상 주의)
-        
-        List<GrantedAuthority> authorities = new ArrayList<>();
-        
-        // 권한 설정
-        if ("admin".equals(username)) {
-            authorities.add(new SimpleGrantedAuthority(SpmallUserGrade.ADMIN.getValue()));
-        } else if ("seller".equals(username)) {
-            authorities.add(new SimpleGrantedAuthority(SpmallUserGrade.SELLER.getValue()));
-        } else {
-            authorities.add(new SimpleGrantedAuthority(SpmallUserGrade.BRONZE.getValue()));
-        }
+     // 권한 가져오기
+        List<GrantedAuthority> authorities = new ArrayList<>(spmallUser.getAuthorities());
+
         log.info("권한 부여 완료");
 
-        return new User(spmallUser.getUsername(), spmallUser.getPassword(), authorities);
+        // SpmallUser를 반환
+        return spmallUser; 
     }
 
 

@@ -45,12 +45,15 @@ public class SpmallProductController {
 	@GetMapping("/list/{category}")
 	public List<SpmallProduct> getProductListByCategory(@PathVariable("category") String category){
 		if(category.equals("all")) {
+			log.info("모든 자료에대한 요청이 들어왔습니다");
 			return this.productService.getAllProduct(); //모든 자료 요청
-		}		
+		}	
+		log.info(category+"에 대한 요청이 들어왔습니다");
 		return this.productService.getProductListByCategory(category); // 자료 하나만 요청
 	}
 	@GetMapping("/{productId}")
-	public SpmallProduct getProduct(@PathVariable Integer productId) {
+	public SpmallProduct getProduct(@PathVariable("productId") Integer productId) {
+		log.info(this.productService.findById(productId).getProductName()+"의 정보입니다");
 		return this.productService.findById(productId);
 	}
 	
@@ -61,12 +64,12 @@ public class SpmallProductController {
 			this.productService.create(spmallProductForm.getProductName(),
 			spmallProductForm.getDescription(), spmallProductForm.getPrice(),
 			spmallProductForm.getQuantity(), spmallProductForm.getCategory(), spmallProductForm.getImageUrl());
-	
+			log.info(spmallProductForm.getProductName()+"의 등록이 요청되었습니다.");
 			responseBody.put("id", this.productService.findByProductName(spmallProductForm.getProductName()).getId().toString());
 			responseBody.put("productName", spmallProductForm.getProductName());
 		}
 		catch(Exception e) {
-            return ResponseEntity.status(500).body("회원가입 오류입니다.");
+            return ResponseEntity.status(500).body("물품 등록 오류입니다.");
         }
 		return ResponseEntity.ok(responseBody);
 	}
@@ -82,7 +85,7 @@ public class SpmallProductController {
 			responseBody.put("productId", spmallProductCartForm.getProductId());
 		}
 		catch(Exception e) {
-            return ResponseEntity.status(500).body("회원가입 오류입니다.");
+            return ResponseEntity.status(500).body("카트 등록 오류입니다.");
         }
 		return ResponseEntity.ok(responseBody);
 	}

@@ -18,8 +18,10 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class SpmallUserService {
+	
 	  private final SpmallUserRepository spmallUserRepository;
-	    private final PasswordEncoder passwordEncoder;
+	  
+	  private final PasswordEncoder passwordEncoder;
 
 	    public SpmallUser findById(Integer id) {
 	        Optional<SpmallUser> byId = this.spmallUserRepository.findById(id);

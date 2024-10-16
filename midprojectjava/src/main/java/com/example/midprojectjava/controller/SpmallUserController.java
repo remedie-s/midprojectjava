@@ -76,8 +76,8 @@ public class SpmallUserController {
         Map<String, Object> responseBody = new HashMap<>();
         responseBody.put("id", spmallUser.getId());
         responseBody.put("username", spmallUser.getUsername());
-        responseBody.put("accessToken", accessToken);
-        responseBody.put("refreshToken", refreshToken);
+//        responseBody.put("accessToken", accessToken);
+//        responseBody.put("refreshToken", refreshToken);
 
         // 회원가입 성공 및 토큰 반환
         return ResponseEntity.ok(responseBody);
@@ -100,15 +100,15 @@ public class SpmallUserController {
         log.info("사용자 ID: " + user.getId());
 
         // 토큰 발급
-//        String accessToken = tokenProvider.createToken(authentication); // 액세스 토큰
-//        String refreshToken = tokenProvider.createRefreshToken(user); // 리프레시 토큰
+        String accessToken = tokenProvider.createToken(authentication); // 액세스 토큰
+        String refreshToken = tokenProvider.createRefreshToken(user); // 리프레시 토큰
 
         // 응답 객체 생성
         Map<String, Object> responseBody = new HashMap<>();
         responseBody.put("id", user.getId());
         responseBody.put("username", username);
-//        responseBody.put("accessToken", accessToken);
-//        responseBody.put("refreshToken", refreshToken);
+        responseBody.put("accessToken", accessToken);
+       responseBody.put("refreshToken", refreshToken);
 
         // 토큰을 클라이언트에게 반환
         return ResponseEntity.ok(responseBody);

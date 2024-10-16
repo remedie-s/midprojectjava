@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.Optional;
 import java.util.Set;
 
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -37,6 +38,7 @@ public class TokenProvider {
 	private final JwtProperties jwtProperties;
 
     private final RefreshTokenRepository refreshTokenRepository;
+    private final SpmallUserService spmallUserService;
 
     public String generateToken(SpmallUser user, Duration expriedAt) {
         Date now = new Date();
@@ -96,13 +98,8 @@ public class TokenProvider {
 
     public Authentication getAuthentication(String token) {
         Claims claims = getClaims(token);
-        Set<SimpleGrantedAuthority> authorities = Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")); // TODO
-                                                                                                                  // 고쳐야함
-                                                                                                                  // 하나만들어갈수있나?
-        return new UsernamePasswordAuthenticationToken(
-                new User(claims.getSubject(), "", authorities),
-                token,
-                authorities);
+        SpmallUser user = this.spmallUserService.findByUsername(claims.getSubject());
+        return new UsernamePasswordAuthenticationToken(user, token, user.getAuthorities());
     }
 
     // 리프레시 토큰 유효성
