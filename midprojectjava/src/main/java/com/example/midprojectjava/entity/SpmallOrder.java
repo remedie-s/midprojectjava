@@ -22,7 +22,6 @@ public class SpmallOrder {
 		@Id
 	    @GeneratedValue(strategy = GenerationType.IDENTITY)
 	    private Integer id;
-
 	    private Integer status;
 	    private Integer request;
 	    private Integer quantity;

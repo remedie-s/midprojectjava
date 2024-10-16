@@ -72,4 +72,9 @@ public class SpmallCartService {
 	        }
 	        this.sCartRepository.deleteAll(carts);
 	    }
+
+		public void save(SpmallCart spmallCart) {
+			this.sCartRepository.save(spmallCart);
+			
+		}
 }
