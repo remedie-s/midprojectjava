@@ -56,6 +56,13 @@ public class SecurityService implements UserDetailsService {
         // SpmallUser를 반환
         return spmallUser; 
     }
+    public SpmallUser findUserByUsername(String username) {
+        Optional<SpmallUser> userOpt = this.spmallUserRepository.findByUsername(username);
+        if (userOpt.isPresent()) {
+            return userOpt.get();
+        }
+        throw new UsernameNotFoundException("유저를 찾을 수 없습니다.");
+    }
 
 
 }

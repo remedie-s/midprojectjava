@@ -35,11 +35,10 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @RequiredArgsConstructor
 public class TokenProvider {
-	private final JwtProperties jwtProperties;
-
+    private final JwtProperties jwtProperties;
     private final RefreshTokenRepository refreshTokenRepository;
-    private final SpmallUserService spmallUserService;
-
+    @Lazy
+    private final SecurityService securityService; // UserService 대신 SecurityService 주입
     public String generateToken(SpmallUser user, Duration expriedAt) {
         Date now = new Date();
         return createToken(new Date(now.getTime() + expriedAt.toMillis()), user);
@@ -98,7 +97,7 @@ public class TokenProvider {
 
     public Authentication getAuthentication(String token) {
         Claims claims = getClaims(token);
-        SpmallUser user = this.spmallUserService.findByUsername(claims.getSubject());
+        SpmallUser user = this.securityService.findUserByUsername(claims.getSubject()); // SecurityService 사용
         return new UsernamePasswordAuthenticationToken(user, token, user.getAuthorities());
     }
 
