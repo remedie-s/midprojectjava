@@ -21,7 +21,7 @@ public class SpmallAddress {
 	    @GeneratedValue(strategy = GenerationType.IDENTITY)
 	    private Integer id;
 	    private String streetName;
-	    private String buildingNumber;
+	    private Integer buildingNumber;
 	    private String detailAddress;
 	    private String city;
 	    @ManyToOne

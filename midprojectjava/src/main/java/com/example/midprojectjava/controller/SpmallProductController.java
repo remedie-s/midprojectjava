@@ -71,6 +71,23 @@ public class SpmallProductController {
         return ResponseEntity.ok(product);
     }
     
+    @PostMapping("/create")
+	public ResponseEntity<?> createProduct(@Valid @RequestBody SpmallProductForm spmallProductForm, HttpServletResponse response) {
+		Map<String, String> responseBody = new HashMap<>();
+		try {
+			this.productService.create(spmallProductForm.getProductName(),
+			spmallProductForm.getDescription(), spmallProductForm.getPrice(),
+			spmallProductForm.getQuantity(), spmallProductForm.getCategory(), spmallProductForm.getImageUrl());
+			log.info(spmallProductForm.getProductName()+"의 등록이 요청되었습니다.");
+			responseBody.put("id", this.productService.findByProductName(spmallProductForm.getProductName()).getId().toString());
+			responseBody.put("productName", spmallProductForm.getProductName());
+		}
+		catch(Exception e) {
+            return ResponseEntity.status(500).body("물품 등록 오류입니다.");
+        }
+		return ResponseEntity.ok(responseBody);}
+    
+    
 	@PostMapping("/cart")
 	public ResponseEntity<?> productToCart(@Valid @RequestBody SpmallProductCartForm spmallProductCartForm, BindingResult result, HttpServletResponse response) {
 	    if (result.hasErrors()) {

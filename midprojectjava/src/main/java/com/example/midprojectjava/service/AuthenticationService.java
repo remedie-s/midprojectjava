@@ -39,5 +39,4 @@ public class AuthenticationService {
         return tokenProvider.getAuthentication(token);
     }
 
-    // 필요에 따라 추가적인 메서드를 작성
 }

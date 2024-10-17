@@ -4,6 +4,7 @@
 package com.example.midprojectjava.service;
 
 import java.time.DateTimeException;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -30,7 +31,7 @@ public class SpmallAddressService {
 
 	    }
 
-	    public SpmallAddress create(SpmallUser user, String streetName, String buildingNumber, String detailAddress, String city) {
+	    public SpmallAddress create(SpmallUser user, String streetName, Integer buildingNumber, String detailAddress, String city) {
 	    	SpmallAddress sAddress = new SpmallAddress();
 	        sAddress.setSpmallUser(user);
 	        sAddress.setStreetName(streetName);
@@ -39,7 +40,10 @@ public class SpmallAddressService {
 	        sAddress.setCity(city);
 	        this.sAddressRepository.save(sAddress);
 	        return sAddress;
-
+	    }
+	    
+	    public void save (SpmallAddress spmallAddress) {
+	    	this.sAddressRepository.save(spmallAddress);
 	    }
 
 	    public void modify(SpmallAddress sAddress) {
@@ -49,5 +53,10 @@ public class SpmallAddressService {
 	    public void delete(SpmallAddress sAddress) {
 	        this.sAddressRepository.delete(sAddress);
 	    }
+
+		public List <SpmallAddress> findBySpmallUser(SpmallUser spmallUser) {
+			List <SpmallAddress> list =this.sAddressRepository.findAllBySpmallUser(spmallUser);
+			return list;
+		}
 
 }
