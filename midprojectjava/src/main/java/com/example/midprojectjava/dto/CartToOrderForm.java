@@ -9,9 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class CartToOrderForm {
-	
+	private Integer productId;
+	private Integer quantity;
 	private Integer userId;
-	private List<Integer> productIdList;
-	
-
 }
