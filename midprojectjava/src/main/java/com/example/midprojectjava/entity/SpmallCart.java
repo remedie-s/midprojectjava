@@ -30,6 +30,6 @@ public class SpmallCart {
 	    @ManyToOne
 	    private SpmallUser spmallUser;
 
-	    @OneToOne
+	    @ManyToOne
 	    private SpmallProduct spmallProduct;
 }

@@ -1,5 +1,6 @@
 package com.example.midprojectjava.controller;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +24,7 @@ import com.example.midprojectjava.entity.SpmallCart;
 import com.example.midprojectjava.entity.SpmallOrder;
 import com.example.midprojectjava.entity.SpmallProReview;
 import com.example.midprojectjava.entity.SpmallProduct;
+import com.example.midprojectjava.entity.SpmallUser;
 import com.example.midprojectjava.service.SpmallCartService;
 import com.example.midprojectjava.service.SpmallProReviewService;
 import com.example.midprojectjava.service.SpmallProductService;
@@ -87,51 +89,53 @@ public class SpmallProductController {
         }
 		return ResponseEntity.ok(responseBody);}
     
-    
-	@PostMapping("/cart")
-	public ResponseEntity<?> productToCart(@Valid @RequestBody SpmallProductCartForm spmallProductCartForm, BindingResult result, HttpServletResponse response) {
-	    if (result.hasErrors()) {
-	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result.getAllErrors());
-	    }
+    @PostMapping("/cart")
+    public ResponseEntity<?> productToCart(@Valid @RequestBody SpmallProductCartForm spmallProductCartForm, BindingResult result, HttpServletResponse response) {
+        if (result.hasErrors()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result.getAllErrors());
+        }
 
-	    Map<String, Object> responseBody = new HashMap<>();
-	    try {
-	        boolean productInCart = true;
+        Map<String, Object> responseBody = new HashMap<>();
+        try {
+            // 유저 아이디로 카트리스트를 찾은 다음 물품 존재 여부 확인
+            List<SpmallCart> cartlist = this.spmallCartService.findBySpmallUserId(spmallProductCartForm.getUserId());
+            SpmallCart existingCart = null;
 
-	        // 유저 아이디로 카트리스트를 찾은 다음 물품 존재 여부 확인
-	        List<SpmallCart> cartlist = this.spmallCartService.findBySpmallUserId(spmallProductCartForm.getUserId());
-	        for (SpmallCart spmallCart : cartlist) {
-	            if (spmallCart.getSpmallProduct().getId().equals(spmallProductCartForm.getProductId())) {
-	                productInCart = false;
-	                log.info("장바구니에 이미 존재하여 갯수를 추가하였습니다");
+            for (SpmallCart spmallCart : cartlist) {
+                if (spmallCart.getSpmallProduct().getId().equals(spmallProductCartForm.getProductId())) {
+                    existingCart = spmallCart; // 이미 존재하는 카트 항목을 찾음
+                    break;
+                }
+            }
 
-	                this.spmallCartService.create(
-	                    spmallCart.getQuantity() + spmallProductCartForm.getQuantity(),
-	                    this.productService.findById(spmallProductCartForm.getProductId()),
-	                    this.spmallUserService.findById(spmallProductCartForm.getUserId())
-	                );
-	                log.info("카트 등록에 성공했습니다.");
-	                break;
-	            }
-	        }
+            if (existingCart != null) {
+                // 기존 카트 항목의 수량을 업데이트
+                existingCart.setQuantity(existingCart.getQuantity() + spmallProductCartForm.getQuantity());
+                log.info("수량 업데이트: " + existingCart.getQuantity());
+                this.spmallCartService.save(existingCart); // 업데이트
+            } else {
+                // 새로운 카트 항목 생성
+                SpmallProduct product = this.productService.findById(spmallProductCartForm.getProductId());
+                SpmallUser user = this.spmallUserService.findById(spmallProductCartForm.getUserId());
 
-	        if (productInCart) {
-	            this.spmallCartService.create(
-	                spmallProductCartForm.getQuantity(),
-	                this.productService.findById(spmallProductCartForm.getProductId()),
-	                this.spmallUserService.findById(spmallProductCartForm.getUserId())
-	            );
-	            log.info("카트 등록에 성공했습니다.");
-	        }
+                SpmallCart newCart = new SpmallCart();
+                newCart.setQuantity(spmallProductCartForm.getQuantity());
+                newCart.setSpmallProduct(product);
+                newCart.setSpmallUser(user);
+                newCart.setCreateDate(LocalDateTime.now()); // 생성일 추가
+                this.spmallCartService.save(newCart); // 새로운 카트 항목 생성
+                log.info("카트 등록에 성공했습니다.");
+            }
 
-	        responseBody.put("userId", spmallProductCartForm.getUserId());
-	        responseBody.put("productId", spmallProductCartForm.getProductId());
-	    } catch (Exception e) {
-	        log.error("카트 등록 중 오류 발생: ", e);
-	        return ResponseEntity.status(500).body("카트 등록 중 오류가 발생했습니다.");
-	    }
-	    return ResponseEntity.ok(responseBody);
-	}
+            responseBody.put("userId", spmallProductCartForm.getUserId());
+            responseBody.put("productId", spmallProductCartForm.getProductId());
+        } catch (Exception e) {
+            log.error("카트 등록 중 오류 발생: ", e);
+            return ResponseEntity.status(500).body("카트 등록 중 오류가 발생했습니다.");
+        }
+        return ResponseEntity.ok(responseBody);
+    }
+
 	
 	@PostMapping("/modify/{id}")
     public ResponseEntity<List<SpmallProduct>> modifyProduct(@PathVariable("id") Integer id, @Valid @RequestBody SpmallProductForm spmallProductForm) {

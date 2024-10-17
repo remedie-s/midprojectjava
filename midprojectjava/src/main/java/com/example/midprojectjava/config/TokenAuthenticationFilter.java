@@ -1,5 +1,8 @@
 package com.example.midprojectjava.config;
 
+
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 //TODO 리다이렉트 위치 바꿔야함
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -47,12 +50,20 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter{
 	        // 액세스 토큰 검증
 	        if (tokenProvider.isValidToken(accessToken)) {
 	            System.out.println("유효한 액세스 토큰");
+
+	            // 액세스 토큰으로 인증 정보 가져오기
+	            Authentication authentication = tokenProvider.getAuthentication(accessToken);
+	            
+	            // SecurityContext에 인증 정보 설정 <<<=== 여기서 설정해줘야  principal로 로그인정보 획득가능
+	            SecurityContextHolder.getContext().setAuthentication(authentication);
+	            
 	            filterChain.doFilter(request, response);
 	        } else {
 	            System.out.println("유효하지 않은 액세스 토큰");
 	            handleTokenAbsence(response, refreshToken);
 	        }
 	    }
+
 
 	    private String extractTokenFromHeader(HttpServletRequest request) {
 	        String authHeader = request.getHeader("Authorization");

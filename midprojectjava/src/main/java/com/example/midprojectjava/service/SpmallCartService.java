@@ -3,6 +3,7 @@
  */
 package com.example.midprojectjava.service;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,7 +19,8 @@ import com.example.midprojectjava.repository.SpmallCartRepository;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-
+import lombok.extern.slf4j.Slf4j;
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class SpmallCartService {
@@ -51,7 +53,9 @@ public class SpmallCartService {
 
 	        List<SpmallCart> carts = this.sCartRepository.findBySpmallUser_Id(userid);
 	        if (carts.isEmpty()) {
-	            throw new DataNotFoundException("cart 가 없어요");
+	        	List<SpmallCart> cart = new ArrayList<>();
+	        	log.info("카트가 없어서 카트를 생성했습니다");
+	        	return cart;
 	        }
 	        return carts;
 	    }

@@ -1,7 +1,7 @@
 package com.example.midprojectjava.controller;
 
-import java.security.Principal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.midprojectjava.dto.CartListDto;
 import com.example.midprojectjava.dto.CartToOrderForm;
 import com.example.midprojectjava.dto.SpmallProductCartForm;
 import com.example.midprojectjava.entity.SpmallCart;
@@ -41,20 +42,32 @@ public class SpmallCartController {
     private final SpmallOrderService spmallOrderService;
     private final SpmallProductService spmallProductService;
 
-    @GetMapping("/list/")
-    public ResponseEntity<List<SpmallCart>> getCartList(@AuthenticationPrincipal SpmallUser spmallUser) {
-        log.info("회원 명 : {}의 카트리스트 요청이 들어왔습니다.", spmallUser.getFirstName());
+    @GetMapping("/list")
+    public ResponseEntity<List<CartListDto>> getCartList(@AuthenticationPrincipal SpmallUser spmallUser) {
         List<SpmallCart> cartList = this.spmallCartService.findBySpmallUserId(spmallUser.getId());
         
         if (cartList.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
+        List <CartListDto> cartListDtos = new ArrayList<>();
+        for (SpmallCart spmallCart : cartList) {
+        	CartListDto cartListDto=new CartListDto();
+        	cartListDto.setId(spmallCart.getId());
+        	cartListDto.setImageUrl(spmallCart.getSpmallProduct().getImageUrl());
+        	cartListDto.setPrice(spmallCart.getSpmallProduct().getPrice());
+        	cartListDto.setProductName(spmallCart.getSpmallProduct().getProductName());
+        	cartListDto.setQuantity(spmallCart.getQuantity());
+        	cartListDtos.add(cartListDto);
+		}
+        
 
-        return ResponseEntity.ok(cartList);
+        return ResponseEntity.ok(cartListDtos);
     }
 
     @PostMapping("/modify/{id}")
-    public ResponseEntity<List<SpmallCart>> modifyCart(@PathVariable("id") Integer id, @Valid @RequestBody SpmallProductCartForm spmallProductCartForm) {
+    public ResponseEntity<List<CartListDto>> modifyCart(@PathVariable("id") Integer id, 
+    		@Valid @RequestBody SpmallProductCartForm spmallProductCartForm, 
+    		@AuthenticationPrincipal SpmallUser spmallUser) {
         log.info("카트번호 : {}번의 수정요청이 들어왔습니다.", id);
         
         SpmallCart spmallCart = this.spmallCartService.findbyId(id);
@@ -66,12 +79,15 @@ public class SpmallCartController {
         this.spmallCartService.save(spmallCart);
         log.info("카트의 변경이 완료되었습니다.");
         
-        List<SpmallCart> updatedCartList = this.spmallCartService.findBySpmallUserId(spmallProductCartForm.getUserId());
-        return ResponseEntity.ok(updatedCartList);
+        List<CartListDto> list = getCartList(spmallUser).getBody();
+        
+        return ResponseEntity.ok(list);
     }
 
     @PostMapping("/delete/{id}")
-    public ResponseEntity<List<SpmallCart>> deleteCart(@PathVariable("id") Integer id, @Valid @RequestBody SpmallProductCartForm spmallProductCartForm) {
+    public ResponseEntity<List<CartListDto>> deleteCart(@PathVariable("id") Integer id, 
+    		@Valid @RequestBody SpmallProductCartForm spmallProductCartForm,
+    		@AuthenticationPrincipal SpmallUser spmallUser) {
         log.info("카트번호 : {}번의 삭제요청이 들어왔습니다.", id);
 
         SpmallCart spmallCart = this.spmallCartService.findbyId(id);
@@ -81,9 +97,9 @@ public class SpmallCartController {
 
         this.spmallCartService.delete(spmallCart);
         log.info("카트의 물품 삭제가 완료되었습니다.");
-
-        List<SpmallCart> updatedCartList = this.spmallCartService.findBySpmallUserId(spmallProductCartForm.getUserId());
-        return ResponseEntity.ok(updatedCartList);
+        List<CartListDto> list = getCartList(spmallUser).getBody();
+        
+        return ResponseEntity.ok(list);
     }
 
     @PostMapping("/cartToOrder")
