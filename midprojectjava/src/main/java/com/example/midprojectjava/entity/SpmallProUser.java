@@ -23,7 +23,7 @@ public class SpmallProUser {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @OneToOne
+    @ManyToOne
     private SpmallUser spmallUser;
 
     @ManyToOne
