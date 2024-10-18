@@ -1,6 +1,7 @@
 package com.example.midprojectjava.controller;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.midprojectjava.dto.OrderListDto;
 import com.example.midprojectjava.dto.SpmallOrderForm;
 import com.example.midprojectjava.entity.SpmallOrder;
 import com.example.midprojectjava.entity.SpmallUser;
@@ -27,7 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("/order")
+@RequestMapping("api/order")
 @RestController
 public class SpmallOrderController {
     private final SpmallUserService spmallUserService;
@@ -35,26 +37,61 @@ public class SpmallOrderController {
     private final SpmallOrderService spmallOrderService;
     private final SpmallProUserService spmallProUserService;
 
-    @GetMapping("/list/")
-    public ResponseEntity<List<SpmallOrder>> orderList(@AuthenticationPrincipal SpmallUser spmallUser) {
+    @GetMapping("/list")
+    public ResponseEntity<List<OrderListDto>> orderList(@AuthenticationPrincipal SpmallUser spmallUser) {
         log.info("{}님의 주문 내역 리스트 요청이 들어왔습니다.", spmallUser.getFirstName());
         List<SpmallOrder> orders = spmallOrderService.findBySpmallUser_Id(spmallUser.getId());
         if (orders.isEmpty()) {
+        	log.info("주문 내역이 없어요!");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
-        return ResponseEntity.ok(orders);
+        List<OrderListDto> orderListDtos = new ArrayList<>();
+        for (SpmallOrder spmallOrder : orders) {
+        	OrderListDto orderListDto = new OrderListDto();
+        	orderListDto.setId(spmallOrder.getId());
+        	orderListDto.setUserId(spmallUser.getId());
+        	orderListDto.setProductId(spmallOrder.getSpmallProduct().getId());
+        	orderListDto.setProductUrl(spmallOrder.getSpmallProduct().getImageUrl());
+        	orderListDto.setProductPrice(spmallOrder.getSpmallProduct().getPrice());
+        	orderListDto.setQuantity(spmallOrder.getQuantity());
+        	orderListDto.setStatus(spmallOrder.getStatus());
+        	orderListDto.setRequest(spmallOrder.getRequest());
+        	orderListDto.setCreateDate(spmallOrder.getCreateDate());
+        	orderListDtos.add(orderListDto);
+		}
+        
+        return ResponseEntity.ok(orderListDtos);
     }
 
     @GetMapping("/list/admin")
-    public ResponseEntity<List<SpmallOrder>> orderListAdmin() {
-    	//TODO 인증정보 갈라야함
+    public ResponseEntity<List<OrderListDto>> orderListAdmin(@AuthenticationPrincipal SpmallUser spmallUser) {
+//		TODO 인증정보 도입시 집어넣을것 다른데에도 집어넣을수있을듯     	
+//    	Integer userGrade = spmallUser.getUserGrade();
+//    	if(userGrade!=3&&userGrade!=4) {
+//    		log.info("당신의 권한이 부족합니다");
+//    		 return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+//    	}
         log.info("모든 이용자의 주문 내역 리스트 요청이 들어왔습니다.");
         List<SpmallOrder> orders = spmallOrderService.getAllOrder();
-        return ResponseEntity.ok(orders);
+        List<OrderListDto> orderListDtos = new ArrayList<>();
+        for (SpmallOrder spmallOrder : orders) {
+        	OrderListDto orderListDto = new OrderListDto();
+        	orderListDto.setId(spmallOrder.getId());
+        	orderListDto.setUserId(spmallOrder.getSpmallUser().getId());
+        	orderListDto.setProductId(spmallOrder.getSpmallProduct().getId());
+        	orderListDto.setProductUrl(spmallOrder.getSpmallProduct().getImageUrl());
+        	orderListDto.setProductPrice(spmallOrder.getSpmallProduct().getPrice());
+        	orderListDto.setQuantity(spmallOrder.getQuantity());
+        	orderListDto.setStatus(spmallOrder.getStatus());
+        	orderListDto.setRequest(spmallOrder.getRequest());
+        	orderListDto.setCreateDate(spmallOrder.getCreateDate());
+        	orderListDtos.add(orderListDto);
+		}
+        return ResponseEntity.ok(orderListDtos);
     }
     @Transactional
     @PostMapping("/modify/{id}") // 주문 수정 및 리뷰 권한 부여
-    public ResponseEntity<List<SpmallOrder>> modifyOrder(@PathVariable("id") Integer id, @RequestBody SpmallOrderForm spmallOrderForm) {
+    public ResponseEntity<List<OrderListDto>> modifyOrder(@PathVariable("id") Integer id, @RequestBody SpmallOrderForm spmallOrderForm) {
         try {
             SpmallOrder spmallOrder = spmallOrderService.findById(id);
             if (spmallOrder == null) {
@@ -77,8 +114,22 @@ public class SpmallOrderController {
             }
 
             log.info("{}번의 주문 내용 수정 요청이 들어왔습니다.", id);
-            List<SpmallOrder> list = spmallOrderService.findBySpmallUser_Id(spmallOrderForm.getUserId());
-            return ResponseEntity.ok(list);
+            List<SpmallOrder> orders = spmallOrderService.findBySpmallUser_Id(spmallOrderForm.getUserId());
+            List<OrderListDto> orderListDtos = new ArrayList<>();
+            for (SpmallOrder spmallOrder1 : orders) {
+            	OrderListDto orderListDto = new OrderListDto();
+            	orderListDto.setId(spmallOrder1.getId());
+            	orderListDto.setUserId(spmallOrder1.getSpmallUser().getId());
+            	orderListDto.setProductId(spmallOrder1.getSpmallProduct().getId());
+            	orderListDto.setProductUrl(spmallOrder1.getSpmallProduct().getImageUrl());
+            	orderListDto.setProductPrice(spmallOrder1.getSpmallProduct().getPrice());
+            	orderListDto.setQuantity(spmallOrder1.getQuantity());
+            	orderListDto.setStatus(spmallOrder1.getStatus());
+            	orderListDto.setRequest(spmallOrder1.getRequest());
+            	orderListDto.setCreateDate(spmallOrder1.getCreateDate());
+            	orderListDtos.add(orderListDto);
+            }
+            return ResponseEntity.ok(orderListDtos);
         } catch (Exception e) {
             log.error("주문 수정 중 오류 발생: ", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
@@ -86,7 +137,7 @@ public class SpmallOrderController {
     }
 
     @PostMapping("/delete/{id}")
-    public ResponseEntity<List<SpmallOrder>> deleteOrder(@PathVariable("id") Integer id, @RequestBody SpmallOrderForm spmallOrderForm) {
+    public ResponseEntity<List<OrderListDto>> deleteOrder(@PathVariable("id") Integer id, @RequestBody SpmallOrderForm spmallOrderForm) {
         try {
             SpmallOrder spmallOrder = spmallOrderService.findById(id);
             if (spmallOrder == null) {
@@ -96,8 +147,23 @@ public class SpmallOrderController {
             spmallOrderService.delete(spmallOrder);
             log.info("{}번의 주문 내용 삭제 요청이 들어왔습니다.", id);
 
-            List<SpmallOrder> list = spmallOrderService.findBySpmallUser_Id(spmallOrderForm.getUserId());
-            return ResponseEntity.ok(list);
+            List<SpmallOrder> orders = spmallOrderService.findBySpmallUser_Id(spmallOrderForm.getUserId());
+            List<OrderListDto> orderListDtos = new ArrayList<>();
+            for (SpmallOrder spmallOrder1 : orders) {
+            	OrderListDto orderListDto = new OrderListDto();
+            	orderListDto.setId(spmallOrder1.getId());
+            	orderListDto.setUserId(spmallOrder1.getSpmallUser().getId());
+            	orderListDto.setProductId(spmallOrder1.getSpmallProduct().getId());
+            	orderListDto.setProductUrl(spmallOrder1.getSpmallProduct().getImageUrl());
+            	orderListDto.setProductPrice(spmallOrder1.getSpmallProduct().getPrice());
+            	orderListDto.setQuantity(spmallOrder1.getQuantity());
+            	orderListDto.setStatus(spmallOrder1.getStatus());
+            	orderListDto.setRequest(spmallOrder1.getRequest());
+            	orderListDto.setCreateDate(spmallOrder1.getCreateDate());
+            	orderListDtos.add(orderListDto);
+            }
+            return ResponseEntity.ok(orderListDtos);
+            
         } catch (Exception e) {
             log.error("주문 삭제 중 오류 발생: ", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);

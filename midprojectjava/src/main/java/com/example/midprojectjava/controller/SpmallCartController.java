@@ -53,6 +53,7 @@ public class SpmallCartController {
         for (SpmallCart spmallCart : cartList) {
         	CartListDto cartListDto=new CartListDto();
         	cartListDto.setId(spmallCart.getId());
+        	cartListDto.setProductId(spmallCart.getSpmallProduct().getId());
         	cartListDto.setImageUrl(spmallCart.getSpmallProduct().getImageUrl());
         	cartListDto.setPrice(spmallCart.getSpmallProduct().getPrice());
         	cartListDto.setProductName(spmallCart.getSpmallProduct().getProductName());
@@ -104,7 +105,8 @@ public class SpmallCartController {
 
     @PostMapping("/cartToOrder")
     @Transactional
-    public ResponseEntity<String> cartToOrder(@Valid @RequestBody CartToOrderForm cartToOrderForm, @AuthenticationPrincipal SpmallUser spmallUser) {
+    public ResponseEntity<String> cartToOrder(@Valid @RequestBody CartToOrderForm cartToOrderForm, 
+    		@AuthenticationPrincipal SpmallUser spmallUser) {
         log.info("주문을 시작합니다.");
         
         // 로그인 정보 확인
@@ -118,15 +120,13 @@ public class SpmallCartController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("카트에 상품이 없습니다.");
         }
 
-        // 특정 productId와 quantity로 카트에서 제품을 검색
-        SpmallCart spmallCart = spmallCarts.stream()
-            .filter(cart -> cart.getSpmallProduct().getId().equals(cartToOrderForm.getProductId()))
-            .findFirst()
-            .orElse(null);
-
+        // 특정 productId로 카트검색
+        SpmallCart spmallCart = findCartByProductId(spmallCarts, cartToOrderForm.getProductId());
         if (spmallCart == null) {
+            log.info("카트에 제품이 존재하지 않습니다: {}", cartToOrderForm.getProductId());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("카트에 제품이 존재하지 않습니다: " + cartToOrderForm.getProductId());
         }
+
 
         SpmallProduct product = spmallCart.getSpmallProduct();
         
@@ -134,6 +134,7 @@ public class SpmallCartController {
         if (product.getQuantity() < cartToOrderForm.getQuantity()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("재고가 부족합니다: " + product.getProductName());
         }
+        log.info("재고확인후 주문을 생성합니다");
 
         // 주문 생성
         SpmallOrder spmallOrder = new SpmallOrder();
@@ -157,5 +158,16 @@ public class SpmallCartController {
 
         return ResponseEntity.ok("주문이 성공적으로 완료되었습니다.");
     }
+    
+    private SpmallCart findCartByProductId(List<SpmallCart> spmallCarts, Integer productId) {
+    	 for (SpmallCart cart : spmallCarts) {
+    	        if (cart.getSpmallProduct().getId().equals(productId)) {
+    	            return cart; // 찾은 카트 반환
+    	        }
+    	    }
+    	    return null;
+	}
 
+
+	
 }

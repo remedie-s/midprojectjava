@@ -47,6 +47,8 @@ public class SpmallCartService {
 	    	spmallCart.setCreateDate(LocalDateTime.now());
 	    	this.sCartRepository.save(spmallCart);
 	    }
+	    
+
 
 	    
 	    public List<SpmallCart> findBySpmallUserId(Integer userid) {
