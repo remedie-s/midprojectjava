@@ -24,6 +24,8 @@ public class SpmallProReview {
 	    private Integer id;
 		
 	    private String content;
+	    
+	    private float rating;
 
 	    private LocalDateTime createDate;
 

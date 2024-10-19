@@ -12,6 +12,7 @@ public class SpmallProductReviewForm {
 	
 	
 	private String content;
+	private float rating;
 	private Integer userId;
 	private Integer productId;
 

@@ -8,6 +8,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,10 +24,12 @@ import com.example.midprojectjava.dto.SpmallProductReviewForm;
 import com.example.midprojectjava.entity.SpmallCart;
 import com.example.midprojectjava.entity.SpmallOrder;
 import com.example.midprojectjava.entity.SpmallProReview;
+import com.example.midprojectjava.entity.SpmallProUser;
 import com.example.midprojectjava.entity.SpmallProduct;
 import com.example.midprojectjava.entity.SpmallUser;
 import com.example.midprojectjava.service.SpmallCartService;
 import com.example.midprojectjava.service.SpmallProReviewService;
+import com.example.midprojectjava.service.SpmallProUserService;
 import com.example.midprojectjava.service.SpmallProductService;
 import com.example.midprojectjava.service.SpmallUserService;
 
@@ -47,6 +50,8 @@ public class SpmallProductController {
 	private SpmallUserService spmallUserService;
 	@Autowired
 	private SpmallCartService spmallCartService;
+	@Autowired
+	private SpmallProUserService spmallProUserService;
 	
 	 // 카테고리별 제품 목록
     @GetMapping("/list/{category}")
@@ -180,12 +185,22 @@ public class SpmallProductController {
 	    }
 	
 	@PostMapping("/review")
-	public ResponseEntity<?> createProductReview(@Valid @RequestBody SpmallProductReviewForm spmallProductReivewForm, HttpServletResponse response) {
-		Map<String, String> responseBody = new HashMap<>();
+	public ResponseEntity<?> createProductReview(@Valid @RequestBody SpmallProductReviewForm spmallProductReivewForm, HttpServletResponse response, @AuthenticationPrincipal SpmallUser spmallUser) {
+		Map<String, Object> responseBody = new HashMap<>();
+		
+		log.info("{}님의 리뷰등록 요청이 들어왔습니다.", spmallUser.getFirstName());
+		if(
+		this.spmallProUserService.findBySpmallUserAndSpmallProduct(spmallUser, this.productService.findById(spmallProductReivewForm.getProductId()))==null
+		) {
+			log.error("물품 구매 리스트에 {}님이 없어요.",spmallUser.getFirstName());
+			return ResponseEntity.status(500).body("물품 유저 리스트에 해당 유저가 없습니다.");
+		}
+		
 		try {
-			this.spmallProReviewService.create(spmallProductReivewForm.getContent(),this.spmallUserService.findById(spmallProductReivewForm.getUserId()) 
+			this.spmallProReviewService.create(spmallProductReivewForm.getContent(),spmallProductReivewForm.getRating(),spmallUser 
 					, this.productService.findById(spmallProductReivewForm.getProductId()));
-			responseBody.put("id", spmallProductReivewForm.getUserId().toString());
+			responseBody.put("id", spmallProductReivewForm.getUserId());
+			responseBody.put("rating", spmallProductReivewForm.getRating());
 			responseBody.put("content", spmallProductReivewForm.getContent());
 		}
 		catch(Exception e){

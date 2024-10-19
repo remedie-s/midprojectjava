@@ -30,9 +30,10 @@ public class SpmallProReviewService {
 	        throw new DataNotFoundException("review not found for productId: " + id);
 	    }
 
-	    public SpmallProReview create(String content, SpmallUser sUser,SpmallProduct product ) {
+	    public SpmallProReview create(String content,float rating, SpmallUser sUser,SpmallProduct product ) {
 	    	SpmallProReview pReview = new SpmallProReview();
 	        pReview.setContent(content);
+	        pReview.setRating(rating);
 	        pReview.setCreateDate(LocalDateTime.now());
 	        pReview.setSpmallProduct(product);
 	        pReview.setSpmallUser(sUser);
