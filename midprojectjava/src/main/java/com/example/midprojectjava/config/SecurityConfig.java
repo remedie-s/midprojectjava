@@ -52,10 +52,11 @@ public class SecurityConfig   {
             .csrf().disable() // CSRF 비활성화
             .headers((c) -> c.addHeaderWriter(new XFrameOptionsHeaderWriter()))
             // .formLogin().disable() // 폼 로그인을 비활성화하고 JSON으로 로그인 처리
-            .logout((logout) -> logout
-                .logoutRequestMatcher(new AntPathRequestMatcher("/spmallUser/logout"))
-                .logoutSuccessUrl("/spmallUser/login")
-                .invalidateHttpSession(true))
+//            .logout((logout) -> logout
+//                .logoutRequestMatcher(new AntPathRequestMatcher("/spmallUser/logout"))
+//                .logoutSuccessUrl("/spmallUser/login")
+//                .logoutSuccessUrl("http://localhost:3000/")  // 리다이렉트 URL 변경
+//                .invalidateHttpSession(true))//cors 오류로 그냥 메소드 처리함
             .addFilterBefore(new TokenAuthenticationFilter(tokenProvider), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
@@ -68,6 +69,8 @@ public class SecurityConfig   {
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);
+        configuration.addExposedHeader("Authorization"); // 만약 Authorization 헤더에 접근해야 하면 추가
+
         
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration); // 모든 경로에 CORS 적용

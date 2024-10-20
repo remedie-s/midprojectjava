@@ -107,13 +107,23 @@ public class SpmallUserController {
         Map<String, Object> responseBody = new HashMap<>();
         responseBody.put("id", user.getId());
         responseBody.put("username", username);
+        responseBody.put("email", user.getEmail());
         responseBody.put("accessToken", accessToken);
         responseBody.put("refreshToken", refreshToken);
 
         // 토큰을 클라이언트에게 반환
         return ResponseEntity.ok(responseBody);
     }
+    
+    @GetMapping("/logout")
+    public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
+        // 세션 무효화
+    	log.info("로그아웃 요청이 들어왔습니다");
+        request.getSession().invalidate();
 
+        // 기타 로그아웃 관련 처리
+        return ResponseEntity.ok("로그아웃 성공");
+    }
 
     // 추가: 유저 정보 조회 (예시)
     @GetMapping("/{id}")
