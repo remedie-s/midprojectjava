@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.midprojectjava.dto.CartListDto;
+import com.example.midprojectjava.dto.CartSummaryDto;
 import com.example.midprojectjava.dto.CartToOrderForm;
 import com.example.midprojectjava.dto.SpmallProductCartForm;
 import com.example.midprojectjava.entity.SpmallCart;
@@ -60,9 +61,28 @@ public class SpmallCartController {
         	cartListDto.setQuantity(spmallCart.getQuantity());
         	cartListDtos.add(cartListDto);
 		}
-        
-
         return ResponseEntity.ok(cartListDtos);
+    }
+    @GetMapping("/summary")
+    public ResponseEntity<CartSummaryDto> getCartListSummary(@AuthenticationPrincipal SpmallUser spmallUser) {
+        List<SpmallCart> cartList = this.spmallCartService.findBySpmallUserId(spmallUser.getId());
+        
+        if (cartList.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+        
+        CartSummaryDto cartSummaryDto = new CartSummaryDto();
+        Long CostSum=0L;
+        Integer QuantitySum=0;
+        
+        for (SpmallCart spmallCart : cartList) {
+        	CostSum += spmallCart.getSpmallProduct().getPrice();
+        	QuantitySum+=spmallCart.getQuantity();
+		}
+        cartSummaryDto.setTotalCostSum(CostSum);
+        cartSummaryDto.setTotalQuantitySum(QuantitySum);
+        cartSummaryDto.setUserId(spmallUser.getId());
+        return ResponseEntity.ok(cartSummaryDto);
     }
 
     @PostMapping("/modify/{id}")

@@ -1,6 +1,7 @@
 package com.example.midprojectjava.controller;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -219,7 +220,55 @@ public class SpmallProductController {
         }
         return ResponseEntity.ok(reviews);
     }
-	
+    
+    //차트 그리기용 자료 만들어서 보내기
+    
+    @GetMapping("/chartBySellcount")
+    public ResponseEntity<Map<String, Integer>> getChartDataBySellCount() {
+       List<SpmallProduct> allProduct = this.productService.getAllProduct();
+       List<SpmallProduct> elect = new ArrayList<>();
+       List<SpmallProduct> furniture = new ArrayList<>();
+       List<SpmallProduct> grocery = new ArrayList<>();
+       List<SpmallProduct> toy = new ArrayList<>();
+       
+       for (SpmallProduct spmallProduct : allProduct) {
+    	   switch (spmallProduct.getCategory()) {
+    		case "elect" : {elect.add(spmallProduct);}
+    		case "furniture" : {furniture.add(spmallProduct);}
+    		case "grocery" : {grocery.add(spmallProduct);}
+    		case "toy" : {toy.add(spmallProduct);}
+    		
+    		default:
+    			throw new IllegalArgumentException("Unexpected value: " + spmallProduct.getCategory());
+    		}
+	}
+       Integer electSum = 0;
+       Integer furnitureSum = 0;
+       Integer grocerySum = 0;
+       Integer toySum = 0;
+       
+       for (SpmallProduct spmallProduct : elect) {
+    	    electSum+=spmallProduct.getSellCount();
+	};
+	   for (SpmallProduct spmallProduct : furniture) {
+		   furnitureSum+=spmallProduct.getSellCount();
+	};
+	   for (SpmallProduct spmallProduct : grocery) {
+		   grocerySum+=spmallProduct.getSellCount();
+	};   
+	   for (SpmallProduct spmallProduct : toy) {
+			toySum+=spmallProduct.getSellCount();
+	};	
+		Map<String,Integer> data = new HashMap<>();
+		data.put("elect", electSum);
+		data.put("furniture", furnitureSum);
+		data.put("grocery", grocerySum);
+		data.put("toy", toySum);
+		
+       
+       
+        return ResponseEntity.ok(data);
+    }
 	
 
 }
