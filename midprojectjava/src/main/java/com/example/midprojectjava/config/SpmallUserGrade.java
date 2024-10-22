@@ -21,11 +21,11 @@ public enum  SpmallUserGrade {
 	    public static String getRoleByGrade(int grade) {
 	        switch (grade) {
 	            case 0: return ADMIN.getValue();   // 예: 관리자
-	            case 1: return GOLD.getValue();    // 예: 골드
-	            case 2: return SILVER.getValue();  // 예: 실버
-	            case 3: return BRONZE.getValue();  // 예: 브론즈
-	            case 4: return SELLER.getValue();  // 예: 판매자
-	            default: return GOLD.getValue();    // 기본값
+	            case 1: return SELLER.getValue();    // 예: 판매자
+	            case 2: return GOLD.getValue();  // 예: 골드
+	            case 3: return SILVER.getValue();  // 예: 실버
+	            case 4: return BRONZE.getValue();  // 예: 브론즈
+	            default: return BRONZE.getValue();    // 기본값
 	        }
 	    }
 }

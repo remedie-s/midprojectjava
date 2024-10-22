@@ -223,52 +223,56 @@ public class SpmallProductController {
     
     //차트 그리기용 자료 만들어서 보내기
     
-    @GetMapping("/chartBySellcount")
-    public ResponseEntity<Map<String, Integer>> getChartDataBySellCount() {
-       List<SpmallProduct> allProduct = this.productService.getAllProduct();
-       List<SpmallProduct> elect = new ArrayList<>();
-       List<SpmallProduct> furniture = new ArrayList<>();
-       List<SpmallProduct> grocery = new ArrayList<>();
-       List<SpmallProduct> toy = new ArrayList<>();
-       
-       for (SpmallProduct spmallProduct : allProduct) {
-    	   switch (spmallProduct.getCategory()) {
-    		case "elect" : {elect.add(spmallProduct);}
-    		case "furniture" : {furniture.add(spmallProduct);}
-    		case "grocery" : {grocery.add(spmallProduct);}
-    		case "toy" : {toy.add(spmallProduct);}
-    		
-    		default:
-    			throw new IllegalArgumentException("Unexpected value: " + spmallProduct.getCategory());
-    		}
-	}
-       Integer electSum = 0;
-       Integer furnitureSum = 0;
-       Integer grocerySum = 0;
-       Integer toySum = 0;
-       
-       for (SpmallProduct spmallProduct : elect) {
-    	    electSum+=spmallProduct.getSellCount();
-	};
-	   for (SpmallProduct spmallProduct : furniture) {
-		   furnitureSum+=spmallProduct.getSellCount();
-	};
-	   for (SpmallProduct spmallProduct : grocery) {
-		   grocerySum+=spmallProduct.getSellCount();
-	};   
-	   for (SpmallProduct spmallProduct : toy) {
-			toySum+=spmallProduct.getSellCount();
-	};	
-		Map<String,Integer> data = new HashMap<>();
-		data.put("elect", electSum);
-		data.put("furniture", furnitureSum);
-		data.put("grocery", grocerySum);
-		data.put("toy", toySum);
-		
-       
-       
+    @GetMapping("/ChartDataBySellCountOfCate")
+    public ResponseEntity<Map<String, Integer>> getChartDataBySellCountOfCate() {
+        return ResponseEntity.ok(getSellCountDataByCategory());
+    }
+
+    @GetMapping("/ChartDataByTotalCostOfCate")
+    public ResponseEntity<Map<String, Long>> getChartDataByTotalCostOfCate() {
+        return ResponseEntity.ok(getTotalCostDataByCategory());
+    }
+
+    @GetMapping("/ChartDataBySellCountOfProduct")
+    public ResponseEntity<Map<String, Integer>> getChartDataBySellCountOfProduct() {
+        List<SpmallProduct> allProduct = this.productService.getAllProduct();
+        Map<String, Integer> data = new HashMap<>();
+        for (SpmallProduct spmallProduct : allProduct) {
+            data.put(spmallProduct.getProductName(), spmallProduct.getSellCount());
+        }
         return ResponseEntity.ok(data);
     }
-	
+
+    @GetMapping("/ChartDataByTotalCostOfProduct")
+    public ResponseEntity<Map<String, Long>> getChartDataByTotalCostOfProduct() {
+        List<SpmallProduct> allProduct = this.productService.getAllProduct();
+        Map<String, Long> data = new HashMap<>();
+        for (SpmallProduct spmallProduct : allProduct) {
+            Long totalCost = spmallProduct.getSellCount().longValue() * spmallProduct.getPrice()/1000;
+            data.put(spmallProduct.getProductName(), totalCost);
+        }
+        return ResponseEntity.ok(data);
+    }
+
+    private Map<String, Integer> getSellCountDataByCategory() {
+        List<SpmallProduct> allProduct = this.productService.getAllProduct();
+        Map<String, Integer> categoryCountMap = new HashMap<>();
+        
+        for (SpmallProduct spmallProduct : allProduct) {
+            categoryCountMap.merge(spmallProduct.getCategory(), spmallProduct.getSellCount(), Integer::sum);
+        }
+        return categoryCountMap;
+    }
+
+    private Map<String, Long> getTotalCostDataByCategory() {
+        List<SpmallProduct> allProduct = this.productService.getAllProduct();
+        Map<String, Long> categoryCostMap = new HashMap<>();
+        
+        for (SpmallProduct spmallProduct : allProduct) {
+            Long totalCost = spmallProduct.getSellCount().longValue() * spmallProduct.getPrice()/1000;
+            categoryCostMap.merge(spmallProduct.getCategory(), totalCost, Long::sum);
+        }
+        return categoryCostMap;
+    }
 
 }

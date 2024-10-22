@@ -2,6 +2,7 @@ package com.example.midprojectjava.controller;
 
 import java.time.Duration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,10 +11,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.midprojectjava.config.LoginResponse;
+import com.example.midprojectjava.config.SpmallUserGrade;
 import com.example.midprojectjava.dto.SpmallUserForm;
+import com.example.midprojectjava.dto.SpmallUserGradeModifyForm;
 import com.example.midprojectjava.dto.SpmallUserLoginForm;
 import com.example.midprojectjava.entity.SpmallUser;
 import com.example.midprojectjava.service.SpmallUserService;
@@ -125,12 +130,12 @@ public class SpmallUserController {
         return ResponseEntity.ok("로그아웃 성공");
     }
 
-    // 추가: 유저 정보 조회 (예시)
-    @GetMapping("/{id}")
-    public ResponseEntity<SpmallUser> getUser(@PathVariable("id") Integer id) {
-        SpmallUser user = sUserService.findById(id);
-        return ResponseEntity.ok(user);
-    }
+//    // 추가: 유저 정보 조회 (예시)
+//    @GetMapping("/{id}")
+//    public ResponseEntity<SpmallUser> getUser(@PathVariable("id") Integer id) {
+//        SpmallUser user = sUserService.findById(id);
+//        return ResponseEntity.ok(user);
+//    }
 
     // 추가: 리프레시 토큰 처리
     @GetMapping("/reissue/{rToken}")
@@ -138,5 +143,36 @@ public class SpmallUserController {
         String accessToken = tokenService.createNewAccessToken(rToken, 24 * 7);
         utilService.setCookie("access_token", accessToken, utilService.toSecondOfDay(7), response);
         return ResponseEntity.ok("Access token renewed");
+    }
+  @GetMapping("/login")
+  public String login(HttpServletRequest httpServletRequest) {
+      httpServletRequest.getCookies();
+      return "login_form";
+  }
+    
+    @GetMapping("/modifyGrade")
+    public String  ModifyAuthByAdmin(@AuthenticationPrincipal SpmallUser spmallUser,Model model) {
+    	String roleByGrade = SpmallUserGrade.getRoleByGrade(spmallUser.getUserGrade());
+    	if(!roleByGrade.equals("ROLE_ADMIN")) {
+    		log.info("{} 권한이 부족합니다.",roleByGrade);
+    		return null;
+    	}
+    	List<SpmallUser> all = this.sUserService.findAll();
+    	model.addAttribute("users",all);
+    	return "modify_form";
+    	
+    }
+    
+    @PostMapping("/modifyGrade/{id}")
+    public void ModifyAuthByAdmin(@PathVariable ("id") Integer id,@AuthenticationPrincipal SpmallUser spmallUser, SpmallUserGradeModifyForm modifyForm ) {
+    	String roleByGrade = SpmallUserGrade.getRoleByGrade(spmallUser.getUserGrade());
+    	if(!roleByGrade.equals("ROLE_ADMIN")) {
+    		log.info("{} 권한이 부족합니다.",roleByGrade);
+    		return;
+    	}
+    	SpmallUser user = this.sUserService.findById(id);
+    	user.setUserGrade(modifyForm.getUserGrade());
+    	this.sUserService.save(user);
+    	log.info("{}님에 대한 유저 정보 변경이 완료되었습니다." ,user.getUsername());
     }
 }

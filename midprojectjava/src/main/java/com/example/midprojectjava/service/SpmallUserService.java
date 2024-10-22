@@ -1,6 +1,7 @@
 package com.example.midprojectjava.service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -17,7 +18,11 @@ public class SpmallUserService implements UserService {
     
     private final SpmallUserRepository spmallUserRepository;
     private final PasswordEncoder passwordEncoder;
-
+    
+    public List<SpmallUser> findAll(){
+    	return this.spmallUserRepository.findAll();
+    }
+    
     @Override
     public SpmallUser findById(Integer id) {
         return spmallUserRepository.findById(id)
@@ -39,8 +44,13 @@ public class SpmallUserService implements UserService {
         user.setLastName(lastName);
         user.setPhoneNumber(phoneNumber);
         user.setEmail(email);
-        user.setUserGrade(0);
+        user.setUserGrade(4);//기본 유저 그레이드 브론즈
         user.setCreateDate(LocalDateTime.now());
         return spmallUserRepository.save(user);
     }
+
+	public void save(SpmallUser user) {
+		this.spmallUserRepository.save(user);
+		
+	}
 }
