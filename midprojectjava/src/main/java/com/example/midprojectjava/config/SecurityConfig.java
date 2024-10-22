@@ -38,7 +38,7 @@ public class SecurityConfig   {
             .cors() // CORS 활성화
             .and()
             .authorizeHttpRequests((a) -> a
-                .requestMatchers(new AntPathRequestMatcher("/spmallUser/**")).permitAll()
+//                .requestMatchers(new AntPathRequestMatcher("/spmallUser/**")).permitAll()
                 .requestMatchers(new AntPathRequestMatcher("/spmallUser/login")).permitAll()
                 .requestMatchers(new AntPathRequestMatcher("/spmallUser/signup")).permitAll() 
                 .requestMatchers(new AntPathRequestMatcher("/homepage/**")).permitAll()

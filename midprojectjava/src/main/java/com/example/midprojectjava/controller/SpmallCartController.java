@@ -66,7 +66,10 @@ public class SpmallCartController {
     @GetMapping("/summary")
     public ResponseEntity<CartSummaryDto> getCartListSummary(@AuthenticationPrincipal SpmallUser spmallUser) {
         List<SpmallCart> cartList = this.spmallCartService.findBySpmallUserId(spmallUser.getId());
-        
+        if (spmallUser == null) {
+	        log.error("AuthenticationPrincipal is null");
+	    } else {
+	        log.info("Authenticated user: {}", spmallUser.getUsername());}
         if (cartList.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }

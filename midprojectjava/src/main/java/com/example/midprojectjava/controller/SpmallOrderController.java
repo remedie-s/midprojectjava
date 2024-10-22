@@ -6,7 +6,9 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,7 +30,6 @@ import com.example.midprojectjava.service.SpmallUserService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.bytebuddy.asm.Advice.This;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -42,6 +43,12 @@ public class SpmallOrderController {
 
     @GetMapping("/list")
     public ResponseEntity<List<OrderListDto>> orderList(@AuthenticationPrincipal SpmallUser spmallUser) {
+    	if (spmallUser == null) {
+ 	        log.error("AuthenticationPrincipal is null");
+ 	    } else {
+ 	        log.info("Authenticated user: {}", spmallUser.getUsername());}
+    	 Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    	    log.info("Current authentication: {}", authentication);
         log.info("{}님의 주문 내역 리스트 요청이 들어왔습니다.", spmallUser.getFirstName());
         List<SpmallOrder> orders = spmallOrderService.findBySpmallUser_Id(spmallUser.getId());
         if (orders.isEmpty()) {
@@ -56,6 +63,10 @@ public class SpmallOrderController {
 
     @GetMapping("/list/admin")
     public ResponseEntity<List<OrderListDto>> orderListAdmin(@AuthenticationPrincipal SpmallUser spmallUser) {
+    	 if (spmallUser == null) {
+ 	        log.error("AuthenticationPrincipal is null");
+ 	    } else {
+ 	        log.info("Authenticated user: {}", spmallUser.getUsername());}
 //		TODO 인증정보 도입시 집어넣을것 다른데에도 집어넣을수있을듯     	
 //    	Integer userGrade = spmallUser.getUserGrade();
 //    	if(userGrade!=3&&userGrade!=4) {

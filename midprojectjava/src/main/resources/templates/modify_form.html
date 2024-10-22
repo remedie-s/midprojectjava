@@ -2,14 +2,14 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Insert title here</title>
+<title>유저 등급 변경</title>
 </head>
 <body>
   <div class="content-header">
     <div class="container-fluid">
       <div class="row mb-2">
         <div class="col-sm-6">
-          <h1 class="m-0">카트 목록</h1>
+          <h1 class="m-0">유저 등급 변경</h1>
         </div>
         <!-- /.col -->
         <div class="col-sm-6">
@@ -27,8 +27,8 @@
     <div class="row mb-2">
       <div class="col-sm-6">
         <h3 class="m-0">
-          카트 총 가격 <br />
-          <span th:text="|${cartsum}원|"> </span>
+          총 회원 수 <br />
+          <span th:text="|${size}원|"> </span>
         </h3>
       </div>
     </div>
@@ -54,31 +54,31 @@
               </tr>
             </thead>
             <tbody>
-              <tr th:each="user, idx : ${users}">
-                <td>
-                  <span th:text="${user.id}"></span>
-                </td>
-                <td>
-                  <span th:text="${user.username}"></span>
-                </td>
-                <td>
-                  <span th:text="${user.phoneNumber}"></span>
-                </td>
-                <td>
-                  <span th:text="${user.email}"></span>
-                </td>
-                <td>
-                  <span th:text="${user.createDate}"></span>
-                </td>
-                <td>
-                  <span th:text="${user.userGrade}"></span>
-                </td>
-                <td>
-                  <span th:text="${user.createDate}"></span> // TODO 고쳐야함
-                </td>
-                <td>
-                  <a th:href="@{|/spmallUser/modifyGrade/${user.id}|}">변경</a>
-                </td>
+				<tr th:each="user, idx : ${users}">
+				               <td><span th:text="${user.id}"></span></td>
+				               <td><span th:text="${user.username}"></span></td>
+				               <td><span th:text="${user.phoneNumber}"></span></td>
+				               <td><span th:text="${user.email}"></span></td>
+				               <td><span th:text="${user.createDate}"></span></td>
+				               <td><span th:text="${user.userGrade}"></span></td>
+				               
+				               <!-- 유저 등급 변경 input 필드 -->
+				               <td>
+				                 <form th:action="@{/spmallUser/modifyGrade/{id}(id=${user.id})}" method="post">
+				                   <select name="userGrade">
+				                     <option value="0" th:selected="${user.userGrade == '0'}">ADMIN</option>
+				                     <option value="1" th:selected="${user.userGrade == '1'}">SELLER</option>
+				                     <option value="2" th:selected="${user.userGrade == '2'}">GOLD</option>
+									 <option value="3" th:selected="${user.userGrade == '3'}">SILVER</option>
+									 <option value="4" th:selected="${user.userGrade == '4'}">BRONZE</option>
+				                   </select>
+				               </td>
+				               
+				               <!-- 변경 버튼 -->
+				               <td>
+				                   <button type="submit">변경</button>
+				                 </form>
+				               </td>
               </tr>
             </tbody>
           </table>

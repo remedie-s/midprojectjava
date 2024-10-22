@@ -7,11 +7,13 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
@@ -47,10 +49,10 @@ public class SpmallUserController {
     
     
     // 기존의 회원가입 화면으로 가는 메서드
-    @GetMapping("/signup")
-    public String signupForm() {
-        return "signup_form";
-    }
+//    @GetMapping("/signup")
+//    public String signupForm() {
+//        return "signup_form";
+//    }
 
     // REST API: 회원가입
     @PostMapping("/signup")
@@ -144,35 +146,51 @@ public class SpmallUserController {
         utilService.setCookie("access_token", accessToken, utilService.toSecondOfDay(7), response);
         return ResponseEntity.ok("Access token renewed");
     }
-  @GetMapping("/login")
-  public String login(HttpServletRequest httpServletRequest) {
-      httpServletRequest.getCookies();
-      return "login_form";
-  }
+//  @GetMapping("/signup")
+//  public String login(HttpServletRequest httpServletRequest) {
+//      httpServletRequest.getCookies();
+//      return "login_form";
+//  }
     
-    @GetMapping("/modifyGrade")
-    public String  ModifyAuthByAdmin(@AuthenticationPrincipal SpmallUser spmallUser,Model model) {
-    	String roleByGrade = SpmallUserGrade.getRoleByGrade(spmallUser.getUserGrade());
-    	if(!roleByGrade.equals("ROLE_ADMIN")) {
-    		log.info("{} 권한이 부족합니다.",roleByGrade);
-    		return null;
-    	}
-    	List<SpmallUser> all = this.sUserService.findAll();
-    	model.addAttribute("users",all);
-    	return "modify_form";
-    	
+    @GetMapping("/userList")
+    public ResponseEntity<List<SpmallUser>> userList(@AuthenticationPrincipal SpmallUser spmallUser) {
+    	 Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    	    log.info("Current authentication: {}", authentication);
+    	  if (spmallUser == null) {
+    	        log.error("AuthenticationPrincipal is null");
+    	    } else {
+    	        log.info("Authenticated user: {}", spmallUser.getUsername());}
+//    	log.info(spmallUser.getUsername());
+//        if (!spmallUser.getUserGrade().equals(0)) {
+//            log.info("당신의 권한은 {}입니다. 권한이 부족합니다.", SpmallUserGrade.getRoleByGrade(spmallUser.getUserGrade()));
+//            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null); // 본문에 null 반환
+//        }
+        log.info("유저정보 조회요청이 들어왔습니다.");
+        List<SpmallUser> all = this.sUserService.findAll();
+        return ResponseEntity.ok(all);
     }
-    
+
     @PostMapping("/modifyGrade/{id}")
-    public void ModifyAuthByAdmin(@PathVariable ("id") Integer id,@AuthenticationPrincipal SpmallUser spmallUser, SpmallUserGradeModifyForm modifyForm ) {
-    	String roleByGrade = SpmallUserGrade.getRoleByGrade(spmallUser.getUserGrade());
-    	if(!roleByGrade.equals("ROLE_ADMIN")) {
-    		log.info("{} 권한이 부족합니다.",roleByGrade);
-    		return;
-    	}
-    	SpmallUser user = this.sUserService.findById(id);
-    	user.setUserGrade(modifyForm.getUserGrade());
-    	this.sUserService.save(user);
-    	log.info("{}님에 대한 유저 정보 변경이 완료되었습니다." ,user.getUsername());
+    public ResponseEntity<List<SpmallUser>> ModifyAuthByAdmin(@PathVariable("id") Integer id,
+    		@AuthenticationPrincipal SpmallUser spmallUser,
+                                                               @RequestBody SpmallUserGradeModifyForm modifyForm) {
+//        if (!spmallUser.getUserGrade().equals(0)) {
+//            log.info("당신의 권한은 {}입니다. 권한이 부족합니다.", SpmallUserGrade.getRoleByGrade(spmallUser.getUserGrade()));
+//            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null); // 본문에 null 반환
+//        }
+
+        SpmallUser user = this.sUserService.findById(id);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null); // 유저를 찾지 못했을 경우
+        }
+
+        user.setUserGrade(modifyForm.getUserGrade());
+        this.sUserService.save(user);
+        log.info("{}님에 대한 유저 정보 변경이 완료되었습니다.", user.getUsername());
+
+        List<SpmallUser> all = this.sUserService.findAll();
+        return ResponseEntity.ok(all); // 전체 유저 리스트 반환
     }
+
+    
 }

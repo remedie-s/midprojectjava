@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 public class SpmallUserGradeModifyForm {
 	@Min(0)
-	private Integer userId;
+	private Integer id;
 	@Min(0) @Max(4)
 	private Integer userGrade;
 
