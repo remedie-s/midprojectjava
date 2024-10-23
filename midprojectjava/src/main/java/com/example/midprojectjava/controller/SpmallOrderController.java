@@ -70,11 +70,11 @@ public class SpmallOrderController {
  	    } else {
  	        log.info("Authenticated user: {}", spmallUser.getUsername());}
 //		TODO 인증정보 도입시 집어넣을것 다른데에도 집어넣을수있을듯     	
-//    	Integer userGrade = spmallUser.getUserGrade();
-//    	if(userGrade!=3&&userGrade!=4) {
-//    		log.info("당신의 권한이 부족합니다");
-//    		 return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
-//    	}
+    	Integer userGrade = spmallUser.getUserGrade();
+    	if(userGrade!=3&&userGrade!=4) {
+    		log.info("당신의 권한이 부족합니다");
+    		 return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+    	}
         log.info("모든 이용자의 주문 내역 리스트 요청이 들어왔습니다.");
         List<SpmallOrder> orders = spmallOrderService.getAllOrder();
      // 오더 리스트디티오 리턴 메소드 유저와 오더리스트 파라미터
@@ -142,7 +142,12 @@ public class SpmallOrderController {
     }
 
     @PostMapping("/delete/{id}")
-    public ResponseEntity<List<OrderListDto>> deleteOrder(@PathVariable("id") Integer id, @RequestBody SpmallOrderForm spmallOrderForm) {
+    public ResponseEntity<List<OrderListDto>> deleteOrder(@PathVariable("id") Integer id, @RequestBody SpmallOrderForm spmallOrderForm, @AuthenticationPrincipal SpmallUser spmallUser) {
+    	Integer userGrade = spmallUser.getUserGrade();
+    	if(userGrade!=3&&userGrade!=4) {
+    		log.info("당신의 권한이 부족합니다");
+    		 return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+    	}
         try {
             SpmallOrder spmallOrder = spmallOrderService.findById(id);
             if (spmallOrder == null) {
