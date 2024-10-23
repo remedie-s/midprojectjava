@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.midprojectjava.config.SpmallUserGrade;
 import com.example.midprojectjava.dto.SpmallOrderForm;
 import com.example.midprojectjava.dto.SpmallProductCartForm;
 import com.example.midprojectjava.dto.SpmallProductForm;
@@ -80,7 +81,11 @@ public class SpmallProductController {
     }
     
     @PostMapping("/create")
-	public ResponseEntity<?> createProduct(@Valid @RequestBody SpmallProductForm spmallProductForm, HttpServletResponse response) {
+	public ResponseEntity<?> createProduct(@Valid @RequestBody SpmallProductForm spmallProductForm, HttpServletResponse response, @AuthenticationPrincipal SpmallUser spmallUser) {
+    	 if (!spmallUser.getUserGrade().equals(0)) {
+             log.info("당신의 권한은 {}입니다. 권한이 부족합니다.", SpmallUserGrade.getRoleByGrade(spmallUser.getUserGrade()));
+             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null); // 본문에 null 반환
+         }
 		Map<String, String> responseBody = new HashMap<>();
 		try {
 			this.productService.create(spmallProductForm.getProductName(),
@@ -167,7 +172,11 @@ public class SpmallProductController {
 	
 	
 	 @PostMapping("/delete/{id}")
-	    public ResponseEntity<List<SpmallProduct>> deleteProduct(@PathVariable("id") Integer id, @RequestBody SpmallProductForm spmallProductForm) {
+	    public ResponseEntity<List<SpmallProduct>> deleteProduct(@PathVariable("id") Integer id, @RequestBody SpmallProductForm spmallProductForm,@AuthenticationPrincipal SpmallUser spmallUser) {
+		 if (!spmallUser.getUserGrade().equals(0)) {
+	            log.info("당신의 권한은 {}입니다. 권한이 부족합니다.", SpmallUserGrade.getRoleByGrade(spmallUser.getUserGrade()));
+	            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null); // 본문에 null 반환
+	        }
 	        try {
 	            SpmallProduct spmallProduct = this.productService.findById(id);
 	            if (spmallProduct == null) {

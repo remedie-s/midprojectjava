@@ -17,8 +17,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.midprojectjava.config.SpmallUserGrade;
 import com.example.midprojectjava.dto.OrderListDto;
 import com.example.midprojectjava.dto.SpmallOrderForm;
+import com.example.midprojectjava.dto.SpmallUserGradeModifyForm;
 import com.example.midprojectjava.entity.SpmallOrder;
 import com.example.midprojectjava.entity.SpmallProUser;
 import com.example.midprojectjava.entity.SpmallProduct;
@@ -198,6 +200,46 @@ public class SpmallOrderController {
 		}
 		return orderListDtos;
 	}
+
+    @GetMapping("/userList")
+    public ResponseEntity<List<SpmallUser>> userList(@AuthenticationPrincipal SpmallUser spmallUser) {
+    	 Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    	    log.info("Current authentication: {}", authentication);
+    	  if (spmallUser == null) {
+    	        log.error("AuthenticationPrincipal is null");
+    	    } else {
+    	        log.info("Authenticated user: {}", spmallUser.getUsername());}
+    	log.info(spmallUser.getUsername());
+        if (!spmallUser.getUserGrade().equals(0)) {
+            log.info("당신의 권한은 {}입니다. 권한이 부족합니다.", SpmallUserGrade.getRoleByGrade(spmallUser.getUserGrade()));
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null); // 본문에 null 반환
+        }
+        log.info("유저정보 조회요청이 들어왔습니다.");
+        List<SpmallUser> all = this.spmallUserService.findAll();
+        return ResponseEntity.ok(all);
+    }
+
+    @PostMapping("/modifyGrade/{id}")
+    public ResponseEntity<List<SpmallUser>> ModifyAuthByAdmin(@PathVariable("id") Integer id,
+    		@AuthenticationPrincipal SpmallUser spmallUser,
+                                                               @RequestBody SpmallUserGradeModifyForm modifyForm) {
+        if (!spmallUser.getUserGrade().equals(0)) {
+            log.info("당신의 권한은 {}입니다. 권한이 부족합니다.", SpmallUserGrade.getRoleByGrade(spmallUser.getUserGrade()));
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null); // 본문에 null 반환
+        }
+
+        SpmallUser user = this.spmallUserService.findById(id);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null); // 유저를 찾지 못했을 경우
+        }
+
+        user.setUserGrade(modifyForm.getUserGrade());
+        this.spmallUserService.save(user);
+        log.info("{}님에 대한 유저 정보 변경이 완료되었습니다.", user.getUsername());
+
+        List<SpmallUser> all = this.spmallUserService.findAll();
+        return ResponseEntity.ok(all); // 전체 유저 리스트 반환
+    }
     
    
 }

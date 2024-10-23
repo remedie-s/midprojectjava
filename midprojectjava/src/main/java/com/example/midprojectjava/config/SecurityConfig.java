@@ -38,25 +38,13 @@ public class SecurityConfig   {
             .cors() // CORS 활성화
             .and()
             .authorizeHttpRequests((a) -> a
-//                .requestMatchers(new AntPathRequestMatcher("/spmallUser/**")).permitAll()
                 .requestMatchers(new AntPathRequestMatcher("/spmallUser/login")).permitAll()
                 .requestMatchers(new AntPathRequestMatcher("/spmallUser/signup")).permitAll() 
-                .requestMatchers(new AntPathRequestMatcher("/homepage/**")).permitAll()
-                .requestMatchers(new AntPathRequestMatcher("/spmallProduct/**")).permitAll()
-                .requestMatchers(new AntPathRequestMatcher("/spmallOrder/**")).permitAll()
-                .requestMatchers(new AntPathRequestMatcher("/dist/**")).permitAll()
-                .requestMatchers(new AntPathRequestMatcher("/plugins/**")).permitAll()
-                .requestMatchers(new AntPathRequestMatcher("/api/**")).permitAll()
-                .requestMatchers(new AntPathRequestMatcher("/spmallCart/**")).permitAll()
-                .requestMatchers(new AntPathRequestMatcher("/**")).permitAll())
+                .requestMatchers(new AntPathRequestMatcher("/spmallUser/logout")).permitAll() 
+                .anyRequest().authenticated() 
+            )
             .csrf().disable() // CSRF 비활성화
             .headers((c) -> c.addHeaderWriter(new XFrameOptionsHeaderWriter()))
-            // .formLogin().disable() // 폼 로그인을 비활성화하고 JSON으로 로그인 처리
-//            .logout((logout) -> logout
-//                .logoutRequestMatcher(new AntPathRequestMatcher("/spmallUser/logout"))
-//                .logoutSuccessUrl("/spmallUser/login")
-//                .logoutSuccessUrl("http://localhost:3000/")  // 리다이렉트 URL 변경
-//                .invalidateHttpSession(true))//cors 오류로 그냥 메소드 처리함
             .addFilterBefore(new TokenAuthenticationFilter(tokenProvider), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

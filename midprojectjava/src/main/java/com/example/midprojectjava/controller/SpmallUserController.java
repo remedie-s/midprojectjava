@@ -109,12 +109,13 @@ public class SpmallUserController {
         // 토큰 발급
         String accessToken = tokenProvider.createToken(authentication); // 액세스 토큰
         String refreshToken = tokenProvider.createRefreshToken(user); // 리프레시 토큰
-
+        
         // 응답 객체 생성
         Map<String, Object> responseBody = new HashMap<>();
         responseBody.put("id", user.getId());
         responseBody.put("username", username);
         responseBody.put("email", user.getEmail());
+        responseBody.put("userGrade", user.getUserGrade());
         responseBody.put("accessToken", accessToken);
         responseBody.put("refreshToken", refreshToken);
 
@@ -132,12 +133,6 @@ public class SpmallUserController {
         return ResponseEntity.ok("로그아웃 성공");
     }
 
-//    // 추가: 유저 정보 조회 (예시)
-//    @GetMapping("/{id}")
-//    public ResponseEntity<SpmallUser> getUser(@PathVariable("id") Integer id) {
-//        SpmallUser user = sUserService.findById(id);
-//        return ResponseEntity.ok(user);
-//    }
 
     // 추가: 리프레시 토큰 처리
     @GetMapping("/reissue/{rToken}")
@@ -146,51 +141,8 @@ public class SpmallUserController {
         utilService.setCookie("access_token", accessToken, utilService.toSecondOfDay(7), response);
         return ResponseEntity.ok("Access token renewed");
     }
-//  @GetMapping("/signup")
-//  public String login(HttpServletRequest httpServletRequest) {
-//      httpServletRequest.getCookies();
-//      return "login_form";
-//  }
+
     
-    @GetMapping("/userList")
-    public ResponseEntity<List<SpmallUser>> userList(@AuthenticationPrincipal SpmallUser spmallUser) {
-    	 Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    	    log.info("Current authentication: {}", authentication);
-    	  if (spmallUser == null) {
-    	        log.error("AuthenticationPrincipal is null");
-    	    } else {
-    	        log.info("Authenticated user: {}", spmallUser.getUsername());}
-//    	log.info(spmallUser.getUsername());
-//        if (!spmallUser.getUserGrade().equals(0)) {
-//            log.info("당신의 권한은 {}입니다. 권한이 부족합니다.", SpmallUserGrade.getRoleByGrade(spmallUser.getUserGrade()));
-//            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null); // 본문에 null 반환
-//        }
-        log.info("유저정보 조회요청이 들어왔습니다.");
-        List<SpmallUser> all = this.sUserService.findAll();
-        return ResponseEntity.ok(all);
-    }
-
-    @PostMapping("/modifyGrade/{id}")
-    public ResponseEntity<List<SpmallUser>> ModifyAuthByAdmin(@PathVariable("id") Integer id,
-    		@AuthenticationPrincipal SpmallUser spmallUser,
-                                                               @RequestBody SpmallUserGradeModifyForm modifyForm) {
-//        if (!spmallUser.getUserGrade().equals(0)) {
-//            log.info("당신의 권한은 {}입니다. 권한이 부족합니다.", SpmallUserGrade.getRoleByGrade(spmallUser.getUserGrade()));
-//            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null); // 본문에 null 반환
-//        }
-
-        SpmallUser user = this.sUserService.findById(id);
-        if (user == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null); // 유저를 찾지 못했을 경우
-        }
-
-        user.setUserGrade(modifyForm.getUserGrade());
-        this.sUserService.save(user);
-        log.info("{}님에 대한 유저 정보 변경이 완료되었습니다.", user.getUsername());
-
-        List<SpmallUser> all = this.sUserService.findAll();
-        return ResponseEntity.ok(all); // 전체 유저 리스트 반환
-    }
 
     
 }
